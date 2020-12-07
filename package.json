@@ -1,0 +1,31 @@
+{
+  "name": "aoc-2020",
+  "version": "1.0.0",
+  "description": "",
+  "main": "aoc.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "geti": "DEBUG=* node ./aoc-2.js geti",
+    "watch": "DEBUG=aoc onchange \"$INIT_CWD/../../**/*.js\" \"$INIT_CWD/*.txt\" -- node \"$INIT_CWD/solution.js\""
+  },
+  "author": "Scott Donnelly",
+  "license": "ISC",
+  "dependencies": {
+    "chai": "^4.2.0",
+    "chai-as-promised": "^7.1.1",
+    "chokidar": "^3.4.3",
+    "commander": "^6.2.0",
+    "debug": "^4.3.1",
+    "decache": "^4.6.0",
+    "enquirer": "^2.3.6",
+    "fs-extra": "^9.0.1",
+    "got": "^11.8.0",
+    "lodash": "^4.17.20",
+    "mocha": "^8.2.1",
+    "ora": "^5.1.0",
+    "pkg-dir": "^5.0.0",
+    "readline": "^1.3.0",
+    "sinon": "^9.2.1",
+    "tough-cookie": "^4.0.0"
+  }
+}
