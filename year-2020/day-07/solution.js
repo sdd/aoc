@@ -67,10 +67,14 @@ function part1(input) {
 }
 
 function part2(input) {
-    const containMap = input.reduce((acc, i) => ({ ...acc, [i.name]: i.canContain }), {});
-
+    const containMap = util.list2map(input, 'name', 'canContain');
+    
     function countContents(name) {
-        return 1 + _.sum(containMap[name].map(({ count, name }) => count * countContents(name)));
+        return 1 + _.sum(
+            containMap[name].map(({ count, name }) =>
+                count * countContents(name)
+            )
+        );
     }
 
     return countContents('shiny gold') - 1;

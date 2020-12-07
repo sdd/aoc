@@ -2,6 +2,7 @@ const _ = require('lodash');
 module.exports = {
     array2D,
     ints,
+    list2map,
     minIndexBy,
     maxIndexBy,
     paint2D,
@@ -18,6 +19,45 @@ function ints(str) {
 
 function posints(str) {
     return str.match(REGEX_POSITIVE_INTS).map(Number) || [];
+}
+
+function list2map(list, keyGetter, valGetter) {
+    return list.reduce((acc, item, index) => {
+        let key; let val;
+
+        switch(typeof keyGetter) {
+            case 'number':
+            case 'string':
+                key = item[keyGetter];
+                break;
+
+            case 'function':
+                key = keyGetter(item, index, acc);
+                break;
+
+            default:
+                key = keyGetter;
+        }
+        
+        switch(typeof valGetter) {
+            case 'number':
+            case 'string':
+                val = item[valGetter];
+                break;
+
+            case 'function':
+                val = valGetter(item, index, acc);
+                break;
+
+            default:
+                val = keyGetter;
+        }
+
+        acc[key] = val;
+        
+        return acc;
+
+    }, {});
 }
 
 function array2D(x, y = x, fn = () => 0) {
