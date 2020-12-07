@@ -32,42 +32,61 @@ const ex2expectedP2 = ``;
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
-    return line
-        .map(l => l.split(' bags contain '))
-        .map(([name, cc]) => ({
-            name, canContain: cc.split(', ')
-        })
-        .map(({ name, canContain }) => {
-            const cc = canContain.map(s => {
-                const [count, w1, w2] = s.split(' ');
-                if (count === 'no') {
-                    return 0;
-                }
-                return { count: Number(count), name: `${w1} ${w2}` }
-            });
+    res = line.map(l => l.split(' bags contain '))
+    .map(([bag, canContain]) => {
+        return { name: bag, canContain: canContain.split(', ') };
+    })
 
-            return { name, canContain: cc[0] === 0 ? [] : cc }
-        })
+    res = res.map(({name, canContain}) => {
+        const cc = canContain.map(s => {
+            const [count, w1, w2] = s.split(' ');
+            if (count === 'no') {
+                return { count: 0 };
+            }
+            return { count: Number(count), name: `${w1} ${w2}` }
+        });
+
+        if (cc[0].count == 0) {
+            return { name, canContain: [] };
+        }
+        return { name, canContain: cc }
+    });
+
+    return res;
 }
 
 function part1(input) {
-    let possibles = new Set(['shiny gold']);
+    const containMap = input.reduce((acc, i) => {
+        acc[i.name] = i.canContain;
+        return acc;
+    }, {});
+
+    let possibles = input
+        .filter(x => x.canContain.map(y => y.name).includes('shiny gold')).map(x => x.name);
     
-    let lastSize = -1;
-    while(lastSize != possibles.size) {
-        lastSize = possibles.size;
-        input.forEach(i => {
-            _.forEach(i.canContain, j => {
-                possibles.has(j.name)) && possibles.add(i.name);
-            }); 
-        });
-    };
-    
-    return possibles.size - 1;
+    let newPoss = [];
+    let first = true;
+    while (first || newPoss.length) {
+        first = false;
+        if (newPoss.length) { possibles = possibles.concat(newPoss); }
+        newPoss = [];
+        _.forEach(possibles, p => {
+            newPoss = newPoss.concat(input
+                .filter(x => x.canContain.map(y => y.name).includes(p))
+                .map(x => x.name)
+                .filter(x => !possibles.includes(x))
+            );
+        })
+    }
+
+    return _.uniq(possibles).length;
 }
 
 function part2(input) {
-    const containMap = input.reduce((acc, i) => ({ ...acc, [i.name]: i.canContain });
+    const containMap = input.reduce((acc, i) => {
+        acc[i.name] = i.canContain;
+        return acc;
+    }, {});
 
     function countContents(name) {
         return 1 + _.sum(containMap[name].map(({ count, name }) => count * countContents(name)));
