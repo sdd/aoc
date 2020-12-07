@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "geti": "DEBUG=* node ./aoc-2.js geti",
-    "watch": "DEBUG=aoc onchange \"$INIT_CWD/../../**/*.js\" \"$INIT_CWD/*.txt\" -- node \"$INIT_CWD/solution.js\""
+    "start": "DEBUG=aoc* node ./tool"
   },
   "author": "Scott Donnelly",
   "license": "ISC",
