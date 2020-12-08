@@ -21,3 +21,4 @@ function createWatcher(state, fn) {
         path.join(state.pkgDir, '*.js')
     ]).on('change', fn);
 }
+

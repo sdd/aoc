@@ -48,6 +48,7 @@ const util = require('./utils');
 
     state.watcher = util.createWatcher(state, event => {
         console.log(`${event} changed, rerunning...`);
+        process.stdin.resume();
         showInputStats(state); 
         solveOnce(state);
         showSolvePrompt(state);

@@ -2,6 +2,7 @@ const config = require('./config');
 const d = require('debug')('aocx:state');
 
 const api = require('./aoc-api');
+const { writeHistory } = require('./file-access');
 
 module.exports = {
     aocDayNotYetStarted,
@@ -33,7 +34,8 @@ async function spinUntilProblemOpen(state, spinner) {
 }
 
 async function tryAnswer(state, spinner, part) {
-    d('tryAnswer: state.history = %O', state.history);
+    const answer = state.latestAnswers[part-1];
+    
     // don't do anything if this part has already been answered
     if (state.history.rightAnswers[`part${part}`]) {
         d('part %d already answered, ignoring');
@@ -41,33 +43,39 @@ async function tryAnswer(state, spinner, part) {
     }
 
     // don't do anything if the current answer for this part is not a string or a number
-    if (typeof state.latestAnswers[part-1] !== 'string' && typeof state.latestAnswers[part-1] !== 'number') {
+    if (typeof answer !== 'string' && typeof answer !== 'number') {
         d('refusing to submit a non-string or non-number answer. try reformatting the return value');
         return;
     }
 
     // dont do anything if we already tried that answer
-    const answerToSubmit = String(state.latestAnswers[part-1]);
+    const answerToSubmit = String(answer);
     if (state.history.wrongAnswers[`part${part}`].map(x => x.answer).includes(answerToSubmit)) {
         d('You already tried that. It was wrong');
         return;
     }
 
     // submit the answer
-    const result = await api.submitAnswer(state, spinner, part, state.latestAnswers[part-1]);
+    spinner.start(`Submitting Part ${part} (answer: "${answer}")...`);
+    const result = await api.submitAnswer(state, spinner, part, answer);
     // log the submission in history
+
+    if (result.wasLockedOut) {
+        spinner.fail(`You are locked out for ${result.lockoutTime} seconds`);
+        state.history.submissionBlockedUntil = new Date(Date.now() + (result.lockoutTime * 1000));
+        return;
+    }
     
     if (result.wasCorrect) {
         // log the correct answer and the time it was answered
         state.history.rightAnswers[`part${part}`] = { answer: answerToSubmit, succeeded: new Date() };
     } else {
         // log the incorrect answer so we don'tsubmit that again and can flag it in the logger
-        state.history.wrongAnswers.push({ answer: answerToSubmit, submitted: new Date() });
+        state.history.wrongAnswers[`part${part}`].push({ answer: answerToSubmit, submitted: new Date() });
         // if there was a lockout, update the lockout expiry time
         if (result.lockoutTime) {
-            state.history.submissionBlockedUntil = new Date(Date.now() + (result.lockoutTime * 1000 * 60));
+            state.history.submissionBlockedUntil = new Date(Date.now() + (result.lockoutTime * 1000));
         }
     }
-
-    d('tryAnswer: final state = %O', state);
+    writeHistory(state);
 }

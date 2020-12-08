@@ -1,6 +1,6 @@
 const _ = require('lodash');
 
-const GOT_RETRY = 5;
+const GOT_RETRY = 1;
 const TZ_OFFSET = 5;
 
 const TEMPLATE_FILES = [ 'solution.js', 'solution.test.js'];

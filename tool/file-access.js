@@ -13,6 +13,7 @@ module.exports = {
     ensureSolutionFilesExist,
     ensureHistoryFileExists,
     getDayFolderPath,
+    writeHistory,
 }
 
 function ensureYearFolderExists(state) {
@@ -54,11 +55,17 @@ async function ensureHistoryFileExists(state, spinner) {
         return content;
     } else {
         spinner.text = 'creating new history file';
-        content = { ...state, created: (new Date()).toISOString() };
+        let content = { ...createHistory(), created: (new Date()).toISOString() };
         await fse.writeJson(histFilePath, content);
         spinner.succeed('history file created');
         return content;
     }
+}
+
+async function writeHistory(state, spinner) {
+    const histFilePath = path.join(getDayFolderPath(state), 'history.json');
+    let content = state.history;
+    await fse.writeJson(histFilePath, content);
 }
 
 async function ensureInputFilesExist(state, spinner) {
@@ -85,3 +92,17 @@ async function ensureInputFilesExist(state, spinner) {
     }
 }
 
+function createHistory() {
+    return {
+        "submissionBlockedUntil": false,
+        "sessions": [],
+        "wrongAnswers": {
+            "part1": [],
+            "part2": []
+        },
+        "rightAnswers": {
+            "part1": false,
+            "part2": false
+        }
+    };
+}
