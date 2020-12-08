@@ -56,11 +56,9 @@ function part1(input) {
     let lastSize = -1;
     while(lastSize != possibles.size) {
         lastSize = possibles.size;
-        input.forEach(i => {
-            _.forEach(i.canContain, j => {
-                possibles.has(j.name) && possibles.add(i.name);
-            }); 
-        });
+        input.forEach(i => i.canContain.forEach(j =>
+            possibles.has(j.name) && possibles.add(i.name)
+        ));
     };
     
     return possibles.size - 1;
@@ -69,13 +67,9 @@ function part1(input) {
 function part2(input) {
     const containMap = util.list2map(input, 'name', 'canContain');
     
-    function countContents(name) {
-        return 1 + _.sum(
-            containMap[name].map(({ count, name }) =>
-                count * countContents(name)
-            )
-        );
-    }
+    const countContents = name => (1 + _.sumBy(
+        containMap[name], i => i.count * countContents(i.name)
+    ));
 
     return countContents('shiny gold') - 1;
 }
