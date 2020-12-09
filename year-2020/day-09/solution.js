@@ -1,6 +1,5 @@
 const d = require('debug')('solution');
 const _ = require('lodash');
-const md5 = require('md5');
 
 const util = require('../../utils');
 const imp = require('../../imp');
@@ -27,31 +26,41 @@ const ex2expectedP2 = ``;
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
-    return line[0];
+    return line.map(Number);
 }
 
 function part1(input) {
-
-    let i = -1;
-    let hash = '';
-    while(String(hash).slice(0, 5) !== '00000') {
-        i++;
-        hash = md5(`${input}${String(i)}`);
+    for(let i = 25; i < input.length; i++) {
+        const sums = new Set();
+        for(let j = i-25; j < i; j++) {
+            for(let k = i-25; k < i; k++) {
+                if (j!==k) sums.add(input[k]+input[j]);
+            }
+        }
+        
+        if (!sums.has(input[i])) {
+            return input[i];
+        }
     }
-    
-    return i;
+    return false;
 }
 
 function part2(input) {
+    const target = 675280050;
 
-    let i = -1;
-    let hash = '';
-    while(String(hash).slice(0, 6) !== '000000') {
-        i++;
-        hash = md5(`${input}${String(i)}`);
+    for (let l = 2; l < input.length - 2; l++) {
+        for(let start = 0; start < input.length - l; start++) {
+            const val = _.sum(input.slice(start, start+l+1));
+            
+            if (val === target) {
+                const min = _.min(input.slice(start, start+l+1));
+                const max = _.max(input.slice(start, start+l+1));
+                return min + max;
+            }
+        }
     }
     
-    return i;
+    return false;
 }
 
 module.exports = {
