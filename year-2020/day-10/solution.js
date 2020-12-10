@@ -86,22 +86,11 @@ function part1(input) {
 }
 
 function part2(input) {
-    input = [0, ...input];
-    const mapCombosToEnd = {
-        [input.pop()]: 1
-    };
-
-    while(input.length) {
-        const curr = input.pop();
-        let total = 0;
-        for(let i = 1; i <= 3; i++) {
-            if (mapCombosToEnd[curr+i]) {
-                total += mapCombosToEnd[curr+i];
-            }
-        }
-        mapCombosToEnd[curr] = total;
-    }
-
+    input.unshift(0);
+    let curr = input.pop();
+    const mapCombosToEnd = { [curr]: 1 };
+    while ((curr = input.pop()) !== undefined)
+        mapCombosToEnd[curr] = (mapCombosToEnd[curr + 1] || 0) + (mapCombosToEnd[curr + 2] || 0) + (mapCombosToEnd[curr + 3] || 0);
     return mapCombosToEnd[0];
 }
 
