@@ -85,12 +85,19 @@ function part1(input) {
     return [gap1v, gap3v];
 }
 
+// yay, golfed to a single statement
 function part2(input) {
+    return [...input.reverse(), 0].reduce((a, i) => ({ ...a, [i]: ((a[i + 1] || 0) + (a[i + 2] || 0) + (a[i + 3] || 0)) || 1 }), {})[0];
+}
+
+function part2_more_readable(input) {
     input.unshift(0);
     let curr = input.pop();
     const mapCombosToEnd = { [curr]: 1 };
-    while ((curr = input.pop()) !== undefined)
+    while (input.length) {
+        curr = input.pop();
         mapCombosToEnd[curr] = (mapCombosToEnd[curr + 1] || 0) + (mapCombosToEnd[curr + 2] || 0) + (mapCombosToEnd[curr + 3] || 0);
+    }
     return mapCombosToEnd[0];
 }
 
