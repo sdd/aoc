@@ -144,9 +144,7 @@ function part2(input) {
 
                 let adjOccCount = 0;
                 for (let d = 0; d < 8; d++) {
-                    if (occupiedInDir(input, r, c, d)) {
-                        adjOccCount++;
-                    }
+                    if (occupiedInDir(input, r, c, d)) adjOccCount++;
                 }
 
                 if (row[c] === 'L') {
