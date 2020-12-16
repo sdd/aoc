@@ -53,7 +53,9 @@ function solveOnce(state) {
         const result1 = soln.part1(parsed);
         d('part1 result: %o', result1);
         d('executing part2...');
+        let started = Date.now();
         const result2 = soln.part2(parsed);
+        d('duration: %ds', (Date.now() - started) / 1000);
         d('part2 result: %o', result2);
         console.log(chalk.red(dashPad()));
 
@@ -62,7 +64,7 @@ function solveOnce(state) {
             result1,
             result2
         };
-        
+
     } catch(e) {
         console.error(e);
     }
