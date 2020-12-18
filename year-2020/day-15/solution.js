@@ -26,17 +26,17 @@ const ex2expectedP2 = ``;
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
-    return [0,13,16,17,1,10,6];
+    return comma.map(Number);
 }
 
 function part1(input) {
+    input = [...input];
     let count = input.length;
     while (count <= 2020) {
         let last = input[input.length - 1];
         let lastSpoken = _.findLastIndex(input.slice(0, input.length - 1), x => x === last);
         if (lastSpoken == -1) {
             input.push(0);
-
         } else {
             input.push((input.length) - (lastSpoken + 1));
         }
@@ -47,36 +47,27 @@ function part1(input) {
 }
 
 function part2(input) {
-    input = [0,13,16,17,1,10,6];
-    let started = Date.now();
-
-    let count = 8;
-    let lastSeen = {
+    let lastSeen = input.reduce((acc, val, index) => ({ ...acc, [val]: index+1 }));
+    /*let lastSeen = {
         0: 1,
         13: 2,
         16: 3,
         17: 4,
         1: 5,
         10: 6,
-    };
+    };*/
 
-    let prevElem = 6;
+    let prevElem = _.last(input);
+    let count = input.length + 1;
     let val;
 
     while (count <= 30000000) {
-        if (lastSeen[prevElem] === undefined) {
-            lastSeen[prevElem] = count - 1;
-            prevElem = 0;
-        } else {
-            val = count - lastSeen[prevElem] - 1;
-            lastSeen[prevElem] = count - 1;
-            prevElem = val;
-        }
+        //val = lastSeen[prevElem] === undefined ? 0 : (count - lastSeen[prevElem] - 1)
+        lastSeen[prevElem] = count - 1;
+        prevElem = lastSeen[prevElem] === undefined ? 0 : (count - lastSeen[prevElem] - 1);
         count++;
     }
 
-    let duration = (Date.now() - started) / 1000;
-    d('duration: %ds', duration);
     return val;
 }
 

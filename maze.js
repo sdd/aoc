@@ -1,4 +1,31 @@
+const d = require('debug')('aoc:maze');
+
 const NOTHING = undefined;
+
+// Definitions:
+// RC:   RowColumn. an absolute position in the form of [row, column].
+// RCD:  RowColumnDelta. Change in RowColumn to move in a specific direction
+// D4:   Dir4. Integer from 0-3 representing a cardinal direction
+// D8:   Dir8. Integer from 0-7 representing cardinal or diagonal direction
+// D / DIST: Integer representing a multiplier of RCD over which to move
+
+const D4_TO_RCD = Object.freeze([
+    [-1, 0], // N / U
+    [0, 1],  // E / R
+    [1, 0],  // S / D
+    [0, -1], // W / L
+]);
+
+const D8_TO_RCD = Object.freeze([
+    [-1, 0], // N / U
+    [-1, 1], // NE
+    [0, 1],  // E / R
+    [1, 1],  // SE
+    [1, 0],  // S / D
+    [1, -1], // SW
+    [0, -1], // W / L
+    [-1, -1], // NW
+]);
 
 module.exports = {
     newState,
@@ -24,8 +51,7 @@ function setDir(state, dxy) {
 
 function turnDir(state, deltaDxy) {
     let dxy = state.dxy + deltaDxy;
-    if (dxy < 0) { dxy = dxy + 4; }
-    if (dxy > 3) { dxy = dxy - 4; }
+    dxy = ((dxy % 4) + 4) % 4;
 
     state.dxy = dxy;
     d('new dir: %d', dxy);
