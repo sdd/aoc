@@ -83,29 +83,26 @@ function part2(input) {
     const mem = {};
 
     _.forEach(input, ({ mask, ops }) => {
-        let maskBits = mask.split('').reverse().map((v, i) => ([v, i]));
-        let [xBits, nBits]  = _.partition(maskBits, ([val]) => val === 'X');
+        let maskBits = mask.split('').map(Number).reverse().map((v, i) => ([v, i]));
+        let [xBits, nBits]  = _.partition(maskBits, ([val]) => Number.isNaN(val));
         let xbnperm = 2 ** xBits.length;
-        nBits = nBits.filter(([val]) => val === '1');
+        //nBits = nBits.filter(([val]) => val);
 
         _.forEach(ops, ([dest, value]) => {
-
-            let startMask = dest.toString(2).padStart(36, '0');
+            let start = dest
             _.forEach(nBits, ([val, idx]) => {
-                startMask = startMask.substr(0, 35 - idx) + val + startMask.substr(36 - idx)
+                start &= val ? (1 << idx) : ~(1 << idx);
             });
 
             for(let xbi = 0; xbi < xbnperm; xbi++) {
-                let memMask = startMask;
-                let xbiBits = xbi.toString(2).padStart(36, '0');
+                let memIdx = start;
 
                 _.forEach(xBits, ([, bit], xBitIndex) => {
-                    let val = xbiBits.charAt(35 - xBitIndex);
-                    memMask = memMask.substr(0, 35 - bit) + val + memMask.substr(36 - bit);
+                    let bv = 1 << xBitIndex;
+                    memIdx &= (xbi & bv) ? bv : ~bv;
                 });
 
-                let memDest = parseInt(memMask, 2);
-                mem[memDest] = value;
+                mem[memIdx] = value;
             }
         });
     })
@@ -124,4 +121,3 @@ module.exports = {
     part2,
     parse,
 };
-
