@@ -90,10 +90,10 @@ function part2([{nearby, fields, yours}]) {
     );
 
     while(true) {
-        let cand = _.findIndex(fieldMap, { length: 1 });
+        const cand = _.findIndex(fieldMap, { length: 1 });
         if (cand !== -1) {
-            let candVal = fieldMap[cand][0];
-            fieldMap = fieldMap.map(l => (typeof l === 'number' ? l : l.filter(v => v !== candVal)));
+            const candVal = fieldMap[cand][0];
+            fieldMap = fieldMap.map(x => (_.isNumber(x) ? x : _.without(x, candVal)));
             fieldMap[cand] = candVal;
             continue;
         }
