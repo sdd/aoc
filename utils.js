@@ -38,7 +38,7 @@ function list2map(list, keyGetter, valGetter) {
             default:
                 key = keyGetter;
         }
-        
+
         switch(typeof valGetter) {
             case 'number':
             case 'string':
@@ -54,7 +54,7 @@ function list2map(list, keyGetter, valGetter) {
         }
 
         acc[key] = val;
-        
+
         return acc;
 
     }, {});
@@ -83,10 +83,10 @@ function minIndexBy(arr, fn = x => x) {
 }
 
 function paint2D(arr) {
-    for (y = 0; y < arr[0].length; y++) {
+    for (r = 0; r < arr.length; r++) {
         let out = '';
-        for(x = 0; x < arr.length; x++) {
-            switch (arr[x][y]) {
+        for(c = 0; c < arr[0].length; c++) {
+            switch (arr[r][c]) {
                 case 0:
                     out += ' ';
                     break;
@@ -95,6 +95,9 @@ function paint2D(arr) {
                     break;
                 case -1:
                     out += '.';
+                    break;
+                default:
+                    out += arr[r][c];
                     break;
             }
             // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
@@ -111,5 +114,5 @@ function for2D(arr, fn, {
         for(j = 0; yCond(); j++) {
             fn(i, j, arr);
         }
-    }   
+    }
 }

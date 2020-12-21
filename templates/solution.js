@@ -11,7 +11,7 @@ const ex1 = ``;
 const ex1expectedP1 = ``;
 const ex1expectedP2 = ``;
 
-// Seconf example and expected answers for each part.
+// Second example and expected answers for each part.
 // Ignored if empty strings.
 const ex2 = ``;
 const ex2expectedP1 = ``;
