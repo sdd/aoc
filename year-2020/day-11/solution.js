@@ -117,8 +117,8 @@ function occupiedInDir(input, r, c, dir) {
         }
         if (input[r][c] === 'L') {
             return false;
-
         }
+
         r = r + dirs[dir][0];
         c = c + dirs[dir][1];
     }

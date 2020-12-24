@@ -49,15 +49,15 @@ function part1(input) {
         const seen = {};
         grp.forEach(person => {
             person.split('').forEach(q => {
-                 if (!seen[q]) { seen[q] = 1; }
-                 else { seen[q]++ };
+                if (!seen[q]) { seen[q] = 1; }
+                else { seen[q]++; }
             });
         });
 
         return Object.keys(seen).length;
-        
-    });    
-    
+
+    });
+
     return _.sum(res);
 }
 
@@ -66,20 +66,16 @@ function part2(input) {
         const seen = {};
         grp.forEach(person => {
             person.split('').forEach(q => {
-                 if (!seen[q]) { seen[q] = 1; }
-                 else { seen[q]++ };
+                if (!seen[q]) { seen[q] = 1; }
+                else { seen[q]++; }
             });
         });
 
         return [seen, grp.length];
-        
+
     });
 
-    res = res.map(([seen, len]) => {
-        let count = Object.values(seen).filter(x => x === len).length;
-        return count;
-    });
-
+    res = res.map(([seen, len]) => Object.values(seen).filter(x => x === len).length);
     return _.sum(res);
 }
 

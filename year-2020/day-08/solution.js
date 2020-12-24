@@ -46,12 +46,12 @@ function part1(input) {
             return ['terminated', acc];
         }
         visited.add(pc);
-        
+
         const { inst, op } = input[pc];
         switch (inst) {
             case 'nop':
-            pc++;
-            break;
+                pc++;
+                break;
 
             case 'acc':
                 acc += op;
@@ -63,7 +63,7 @@ function part1(input) {
                 break;
         }
     }
-    
+
     return [ 'loop', acc ];
 }
 
@@ -84,7 +84,7 @@ function part2(input) {
         if (res[0] === 'terminated') return res[1];
         editLoc++;
     }
-    
+
     return false;
 }
 

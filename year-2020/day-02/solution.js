@@ -31,7 +31,7 @@ function part1(input) {
 function part2(input) {
     return input
     .filter(([ lo, hi, letter, p ]) =>
-        (p[lo - 1] === letter) != (p[hi - 1] === letter) 
+        (p[lo - 1] === letter) !== (p[hi - 1] === letter)
     )
     .length
 }

@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const chalk = require('chalk');
 module.exports = {
     array2D,
     ints,
@@ -8,6 +9,12 @@ module.exports = {
     paint2D,
     posints,
     posInts: posints,
+
+    conwayStep,
+    conwaySteps,
+    adjCountHex,
+
+    arrayCount
 };
 
 const REGEX_INTS = /-?\d+/g;
@@ -90,19 +97,24 @@ function paint2D(arr) {
                 case 0:
                     out += ' ';
                     break;
+                case 'O':
+                    out += chalk.bgGreen(chalk.red('O'));
+                    break;
+                case '#':
                 case 1:
                     out += '█';
                     break;
                 case -1:
                     out += '.';
                     break;
+                case '.':
                 default:
                     out += arr[r][c];
                     break;
             }
             // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
-       }
-       console.log(out);
+        }
+        console.log(out);
     }
 }
 
@@ -115,4 +127,60 @@ function for2D(arr, fn, {
             fn(i, j, arr);
         }
     }
+}
+
+function arrayCount(array, item) {
+    if (typeof item === 'function') {
+        return _.flattenDeep(array).filter(item).length;
+    } else {
+        return _.flattenDeep(array).filter(x => x === item).length;
+    }
+}
+
+function conwayStep(world, adjFunc, adjToNextMap) {
+    let nextWorld = array2D(world.length, world[0].length);
+
+    for(let x = 0; x < world.length; x++) {
+        for(let y = 0; y < world[0].length; y++) {
+            let adjCount = adjFunc(world, x, y);
+
+            let mapNext = adjToNextMap[world[x][y]][adjCount];
+            nextWorld[x][y] = mapNext;
+        }
+    }
+
+    return nextWorld;
+}
+
+function conwaySteps(world, adjCountFn, adjToNextMap, steps) {
+    let nextWorld = world;
+    for(let i = 1; i <= steps; i++) {
+        nextWorld = conwayStep(nextWorld, adjCountFn, adjToNextMap);
+    }
+
+    return nextWorld;
+}
+
+function adjCountHex(world, x, y) {
+    let count = 0;
+    if (x < world.length - 1 && y >= 1) {
+        count += world[x + 1][y - 1] ? 1 : 0;
+    }
+    if (x < world.length - 1) {
+        count += world[x + 1][y] ? 1 : 0;
+    }
+    if (y < world[0].length - 1) {
+        count += world[x][y + 1] ? 1 : 0;
+    }
+
+    if (x >= 1 && y < world[0].length - 1) {
+        count += world[x - 1][y + 1] ? 1 : 0;
+    }
+    if (x >= 1) {
+        count += world[x - 1][y] ? 1 : 0;
+    }
+    if (y >= 1) {
+        count += world[x][y - 1] ? 1 : 0;
+    }
+    return count;
 }

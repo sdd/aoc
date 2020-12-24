@@ -40,7 +40,7 @@ function part1(input) {
     let res = input.filter(x =>
         x.ecl && x.pid && x.eyr && x.hcl && x.byr && x.iyr && x.hgt
     );
-    
+
     return res.length;
 }
 
@@ -57,31 +57,31 @@ function part2(input) {
         x.eyr = Number(x.eyr);
         x.iyr = Number(x.iyr);
 
-       if (x.hgt) {
-           const mIn = x.hgt.match(R_HGT_IN);
-           const mCm = x.hgt.match(R_HGT_CM);
-           if (mIn && Number(mIn[1]) >= 59 && Number(mIn[1]) <= 76) {
-               x.hgt = { unit: 'in', val: Number(mIn[1]) };
-           } else if (mCm && Number(mCm[1]) >= 150 && Number(mCm[1]) <=193) {
-               x.hgt = { unit: 'cm', val: Number(mCm[1]) };
-           } else {
-               x.hgt = false;
-           }
-           
-       }
-        return x; 
+        if (x.hgt) {
+            const mIn = x.hgt.match(R_HGT_IN);
+            const mCm = x.hgt.match(R_HGT_CM);
+            if (mIn && Number(mIn[1]) >= 59 && Number(mIn[1]) <= 76) {
+                x.hgt = { unit: 'in', val: Number(mIn[1]) };
+            } else if (mCm && Number(mCm[1]) >= 150 && Number(mCm[1]) <=193) {
+                x.hgt = { unit: 'cm', val: Number(mCm[1]) };
+            } else {
+                x.hgt = false;
+            }
+
+        }
+        return x;
     });
 
     res = res.filter(x => {
         return (Number.isFinite(x.byr) && x.byr >= 1920 && x.byr <= 2002)
-           && (Number.isFinite(x.iyr) && x.iyr >= 2010 && x.iyr <= 2020)
-           && (Number.isFinite(x.eyr) && x.eyr >= 2020 && x.eyr <= 2030)
-           && x.hgt
-           && x.hcl && R_HCL.test(x.hcl)
-           && x.ecl && VAL_ECL.includes(x.ecl)
-           && x.pid && R_PID.test(x.pid)
+            && (Number.isFinite(x.iyr) && x.iyr >= 2010 && x.iyr <= 2020)
+            && (Number.isFinite(x.eyr) && x.eyr >= 2020 && x.eyr <= 2030)
+            && x.hgt
+            && x.hcl && R_HCL.test(x.hcl)
+            && x.ecl && VAL_ECL.includes(x.ecl)
+            && x.pid && R_PID.test(x.pid)
     });
-    
+
     return res.length;
 }
 
