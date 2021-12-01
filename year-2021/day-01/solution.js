@@ -51,7 +51,7 @@ function part1(input) {
 function part2(input) {
     let c = 0;
     for (i = 0; i <= input.length - 4; i++) {
-        if (input[i+3] > input[i]) {
+        if (input[i + 3] > input[i]) {
             c++;
         }
     }
