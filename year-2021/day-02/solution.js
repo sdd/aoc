@@ -25,10 +25,10 @@ const ex2expectedP2 = ``;
 /**
  * Input parser.
  * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
+ * @param {line} line split on newlines, empty items removed, items trimmed
+ * @param {comma} comma split on commas, empty items removed, items trimmed
+ * @param {space} space split on spaces, empty lines removed, items trimmed
+ * @param {multi} multi, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
     return line;

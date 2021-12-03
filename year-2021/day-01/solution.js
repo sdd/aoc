@@ -40,7 +40,7 @@ function parse({ raw, line, comma, space, multi }) {
 
 function part1(input) {
     let c = 0;
-    for (i = 0; i <= input.length - 2; i++) {
+    for (let i = 0; i <= input.length - 2; i++) {
         if (input[i + 1] > input[i]) {
             c++;
         }
@@ -50,7 +50,7 @@ function part1(input) {
 
 function part2(input) {
     let c = 0;
-    for (i = 0; i <= input.length - 4; i++) {
+    for (let i = 0; i <= input.length - 4; i++) {
         if (input[i + 3] > input[i]) {
             c++;
         }
