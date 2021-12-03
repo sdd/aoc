@@ -6,7 +6,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "geti": "DEBUG=* node ./aoc-2.js geti",
-    "start": "DEBUG=aoc* node ./tool"
+    "start": "DEBUG=aoc* node ./tool",
+    "lint": "eslint --fix",
+    "prettier": "prettier --config ./.prettierrc.json --write './**/*.js'"
   },
   "author": "Scott Donnelly",
   "license": "ISC",
@@ -29,5 +31,15 @@
     "sinon": "^9.2.1",
     "tough-cookie": "^4.0.0",
     "words-to-numbers": "^1.5.1"
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^8.3.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-airbnb": "0.0.1-security",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-prettier": "^4.0.0",
+    "prettier": "^2.5.0"
   }
 }

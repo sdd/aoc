@@ -1,0 +1,10 @@
+package.json
+package-lock.json
+build/*
+dist/*
+node_modules/*
+**/node_modules/*
+public/*
+vendor/*
+.idea/*
+.vscode/*

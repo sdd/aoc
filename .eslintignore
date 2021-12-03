@@ -1,0 +1,8 @@
+build/*
+dist/*
+node_modules/*
+**/node_modules/*
+public/*
+vendor/*
+.idea/*
+.vscode/*
