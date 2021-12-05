@@ -56,37 +56,47 @@ function parse({ raw, line, comma, space, multi }) {
 }
 
 function part1({ callouts, boards }) {
-    let called = new Set();
-    let heard = x => called.has(x);
+    const called = new Set();
+    const wasHeard = x => called.has(x);
 
-    for(let current of callouts) {
+    for(const current of callouts) {
         called.add(current);
 
-        for(let board of boards) {
-            if (_.some(board, row => _.every(row, heard))
-                || _.some(_.range(0, board[0].length), col => _.every(board.map(row => row[col]), heard))) {
-                return current * _.sum(_.reject(_.flatten(board), heard));
+        for(const board of boards) {
+            let won = _.some(board, row => _.every(row, wasHeard));
+
+            won = won || _.some(_.range(0, board[0].length), 
+                col => _.every(board.map(row => row[col]), wasHeard)
+            );
+
+            if (won) {
+                return current * _.sum(_.reject(_.flatten(board), wasHeard));
             }
         }
     }
 }
 
 function part2({ callouts, boards }) {
-    let called = new Set();
-    let heard = x => called.has(x);
-    let remainingBoards = new Set(_.range(0, boards.length));
+    const called = new Set();
+    const wasHeard = x => called.has(x);
+    const remainingBoards = new Set(_.range(0, boards.length));
 
-    for(let current of callouts) {
+    for(const current of callouts) {
         called.add(current);
 
         for(let bi = 0; bi < boards.length; bi++) {
             const board = boards[bi];
 
-            if (_.some(board, row => _.every(row, heard))
-                || _.some(_.range(0, board[0].length), col => _.every(board.map(row => row[col]), heard))) {
+            let won = _.some(board, row => _.every(row, wasHeard));
+            
+            won = won || _.some(_.range(0, board[0].length), 
+                col => _.every(board.map(row => row[col]), wasHeard)
+            );
+
+            if (won) {
                 remainingBoards.delete(bi);
-                if (remainingBoards.size == 0) {
-                    return current * _.sum(_.reject(_.flatten(board), heard));
+                if (remainingBoards.size === 0) {
+                    return current * _.sum(_.reject(_.flatten(board), wasHeard));
                 }
             }
         }
