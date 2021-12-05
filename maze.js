@@ -1,6 +1,7 @@
 const d = require('debug')('aoc:maze');
 
 const NOTHING = undefined;
+const STOP = 'STOP';
 
 // Definitions:
 // RC:   RowColumn. an absolute position in the form of [row, column].
@@ -79,9 +80,9 @@ function turnDir(state, deltaDxy) {
 }
 
 function moveForward(state, dist) {
-    let xy = DXY_TO_XY[state.dxy];
+    const xy = DXY_TO_XY[state.dxy];
 
-    for(i = 0; i < Math.abs(dist); i += Math.sign(dist)) {
+    for(let i = 0; i < Math.abs(dist); i += Math.sign(dist)) {
         const newPos = [state.pos[0] + xy[0], state.pos[1] + xy[1]];
         const action = state.beforeEnter(newPos);
         if (action === NOTHING) {

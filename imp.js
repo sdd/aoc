@@ -1,4 +1,5 @@
 const fs = require('fs');
+
 module.exports = {
     commaStr: importSepParse(',', s => s.trim()),
     spaceStr: importSepParse(' ', s => s.trim()),
@@ -22,10 +23,7 @@ function arrCommaSep(filename) {
 
 function importSepParse(sep, parse, filterEmptyLines = true) {
     return function importer(filename) {
-        return fs.readFileSync(filename, 'utf8')
-            .split(sep)
-            .filter(x => (x !== '' || !filterEmptyLines))
-            .map(parse);
+        return strSepParse(fs.readFileSync(filename, 'utf8'), filterEmptyLines);
     };
 }
 

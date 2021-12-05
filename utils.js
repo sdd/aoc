@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const chalk = require('chalk');
+
 module.exports = {
     array2D,
     ints,
@@ -68,7 +69,7 @@ function list2map(list, keyGetter, valGetter) {
 }
 
 function array2D(x, y = x, fn = () => 0) {
-    let arr = new Array(x);
+    const arr = new Array(x);
 
     for (let i = 0; i < x; i++) {
         arr[i] = new Array(y);
@@ -90,9 +91,9 @@ function minIndexBy(arr, fn = x => x) {
 }
 
 function paint2D(arr) {
-    for (r = 0; r < arr.length; r++) {
+    for (let r = 0; r < arr.length; r++) {
         let out = '';
-        for(c = 0; c < arr[0].length; c++) {
+        for(let c = 0; c < arr[0].length; c++) {
             switch (arr[r][c]) {
                 case 0:
                     out += ' ';
@@ -114,16 +115,18 @@ function paint2D(arr) {
             }
             // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
         }
+        // eslint-disable-next-line no-console
         console.log(out);
     }
 }
 
+// eslint-disable-next-line no-unused-vars
 function for2D(arr, fn, {
     xCond = x => x < arr.length,
     yCond = y => y < arr[0].length
 }) {
-    for(i = 0; xCond(); i++) {
-        for(j = 0; yCond(); j++) {
+    for(let i = 0; xCond(); i++) {
+        for(let j = 0; yCond(); j++) {
             fn(i, j, arr);
         }
     }
@@ -132,19 +135,18 @@ function for2D(arr, fn, {
 function arrayCount(array, item) {
     if (typeof item === 'function') {
         return _.flattenDeep(array).filter(item).length;
-    } else {
-        return _.flattenDeep(array).filter(x => x === item).length;
     }
+    return _.flattenDeep(array).filter(x => x === item).length;
 }
 
 function conwayStep(world, adjFunc, adjToNextMap) {
-    let nextWorld = array2D(world.length, world[0].length);
+    const nextWorld = array2D(world.length, world[0].length);
 
     for(let x = 0; x < world.length; x++) {
         for(let y = 0; y < world[0].length; y++) {
-            let adjCount = adjFunc(world, x, y);
+            const adjCount = adjFunc(world, x, y);
 
-            let mapNext = adjToNextMap[world[x][y]][adjCount];
+            const mapNext = adjToNextMap[world[x][y]][adjCount];
             nextWorld[x][y] = mapNext;
         }
     }
