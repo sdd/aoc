@@ -39,37 +39,24 @@ function parse({ raw, line, comma, space, multi }) {
     return line.map(l => parsers.splitNonAlphanum(l));
 }
 
-function part1(input) {
-    const vals = new Map();
-
-    for (const line of input) {
-        const [x1, y1, x2, y2] = line;
-        if (x1 === x2 || y1 === y2) {
-            const ystep = Math.sign(y2 - y1);
-            const xstep = Math.sign(x2 - x1);
-
-            let x = x1;
-            let y = y1;
-            while(x !== x2 || y !== y2) {
-                setval(vals, x, y)
-                x += xstep;
-                y += ystep;
-            }
-            setval(vals, x2, y2);
-        }
-    }
-
-    return [...vals.values()].filter(v => v >= 2).length;
+class FreqMap extends Map {
+  inc(x, y) {
+    const key = `${x}_${y}`;
+    super.set(key, (super.get(key) || 0) + 1);
+  }
 }
 
-function setval(vals, x, y) {
-    const key = `${x}_${y}`;
-    const val = vals.get(key);
-    vals.set(key, val ? val + 1 : 1);
+function part1(input) {
+    const noDiagonals = input.filter(([x1, y1, x2, y2]) => x1 === x2 || y1 === y2);
+    return partx(noDiagonals);
 }
 
 function part2(input) {
-    const vals = new Map();
+    return partx(input);
+}
+
+function partx(input) {
+    const vals = new FreqMap();
 
     for (const line of input) {
         const [x1, y1, x2, y2] = line;
@@ -79,11 +66,11 @@ function part2(input) {
         let x = x1;
         let y = y1;
         while(x !== x2 || y !== y2) {
-            setval(vals, x, y)
+            vals.inc(x, y);
             x += xstep;
             y += ystep;
         }
-        setval(vals, x2, y2);
+        vals.inc(x, y);
     }
 
     return [...vals.values()].filter(v => v >= 2).length;
