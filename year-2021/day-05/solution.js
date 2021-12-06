@@ -57,11 +57,10 @@ function part2(input) {
 
 function partx(input) {
     const vals = new FreqMap();
-
-    for (const line of input) {
-        const [x1, y1, x2, y2] = line;
-        const ystep = Math.sign(y2 - y1);
+    
+    for (const [x1, y1, x2, y2] of input) {
         const xstep = Math.sign(x2 - x1);
+        const ystep = Math.sign(y2 - y1);
 
         let x = x1;
         let y = y1;
@@ -72,7 +71,7 @@ function partx(input) {
         }
         vals.inc(x, y);
     }
-
+    
     return [...vals.values()].filter(v => v >= 2).length;
 }
 
