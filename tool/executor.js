@@ -34,16 +34,20 @@ function solveOnce(state) {
                 d('ex1: %o', soln.ex1);
                 const input = preProcessInput(soln.ex1);
                 d('ex1 parsed: %o', soln.parse(input));
-                d('ex1 part1 result: %o', soln.part1(soln.parse(input)));
-                d('ex1 part2 result: %o', soln.part2(soln.parse(input)));
+                const ex1p1res = soln.part1(soln.parse(input));
+                const ex1p2res = soln.part2(soln.parse(input));
+                d('ex1 part1 result: %o (expected: %o) %s', ex1p1res, soln.ex1expectedP1, ex1p1res === soln.ex1expectedP1 ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
+                d('ex1 part2 result: %o (expected: %o) %s', ex1p2res, soln.ex1expectedP2, ex1p2res === soln.ex1expectedP2 ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
             }
 
             if (soln.ex2) {
                 d('ex2: %o', soln.ex2);
                 const input = preProcessInput(soln.ex2);
                 d('ex2 parsed: %o', soln.parse(input));
-                d('ex2 part1 result: %o', soln.part1(soln.parse(input)));
-                d('ex2 part2 result: %o', soln.part2(soln.parse(input)));
+                const ex2p1res = soln.part1(soln.parse(input));
+                const ex2p2res = soln.part2(soln.parse(input));
+                d('ex2 part1 result: %o (expected: %o) %s', ex2p1res, soln.ex2expectedP1, ex2p1res === soln.ex2expectedP1 ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
+                d('ex2 part2 result: %o (expected: %o) %s', ex2p2res, soln.ex2expectedP2, ex2p2res === soln.ex2expectedP2 ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
             }
             console.log(chalk.yellow(dashPad()));
         }
@@ -53,7 +57,7 @@ function solveOnce(state) {
         const result1 = soln.part1(parsed);
         d('part1 result: %o', result1);
         d('executing part2...');
-        let started = Date.now();
+        const started = Date.now();
         const result2 = soln.part2(parsed);
         d('duration: %ds', (Date.now() - started) / 1000);
         d('part2 result: %o', result2);
