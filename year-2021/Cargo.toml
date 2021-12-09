@@ -12,6 +12,8 @@ itertools = "0.10.1"
 peg = "0.7.0"
 rayon = "1.5.1"
 regex = "1.5.4"
+strum = "0.23.0"
+strum_macros = "0.23.1"
 
 
 [[bin]]
@@ -42,3 +44,7 @@ path = "day-06/solution.rs"
 [[bin]]
 name = "day-07"
 path = "day-07/solution.rs"
+
+[[bin]]
+name = "day-08"
+path = "day-08/solution.rs"
