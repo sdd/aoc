@@ -11,23 +11,30 @@ module.exports = {
 function dashPad(str, len = process.stdout.columns) {
     if (!str) { return _.repeat('-', len); }
     const remaining = len - 2 - str.length;
-    let left = Math.floor(remaining / 2);
-    let right = Math.ceil(remaining / 2);
+    const left = Math.floor(remaining / 2);
+    const right = Math.ceil(remaining / 2);
 
     return [_.repeat('-', left), str, _.repeat('-', right)].join(' ');
 }
 
 function showSolvePrompt(state) {
-    let options = [
+    const options = [
       { key: 'q', msg: 'quit', color: 'magenta' },
       { key: 'r', msg: 're-run', color: 'green' },
+      { key: 'e', msg: 're-run (examples only)', color: 'green' },
     ];
 
-    if (!state.history.solvedPart1 && isSubmittable(state.latestAnswers[0])) {
-        options.push({ key: '1', msg: 'submit part 1', color: 'bgRed' });
+    if (!state.history?.rightAnswers?.part1 && isSubmittable(state.latestAnswers[0])) {
+        const prevBadAnswers = state.history.wrongAnswers.part1.map(x => x.answer);
+        if (!prevBadAnswers.includes(`${state.latestAnswers[0]}`)) {
+            options.push({ key: '1', msg: 'submit part 1', color: 'bgRed' });
+        }
     }
-    if (!state.history.solvedPart2 && isSubmittable(state.latestAnswers[1])) {
-        options.push({ key: '2', msg: 'submit part 2', color: 'bgRed' });
+    if (!state.history?.rightAnswers?.part1 && isSubmittable(state.latestAnswers[1])) {
+        const prevBadAnswers = state.history.wrongAnswers.part2.map(x => x.answer);
+        if (!prevBadAnswers.includes(`${state.latestAnswers[1]}`)) {
+            options.push({ key: '2', msg: 'submit part 2', color: 'bgRed' });
+        }
     }
 
     const optionStrings = options.map(({ color, key, msg }) =>
