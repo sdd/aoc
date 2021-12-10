@@ -1,4 +1,4 @@
-/* eslint-disable no-continue */
+/* eslint-disable default-case, no-continue, no-restricted-syntax */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
@@ -39,13 +39,26 @@ function parse({ raw, line, comma, space, multi }) {
     return line.map(l => l.split(''));
 }
 
+const OPENER_MAP = {
+    ')': '(',
+    ']': '[',
+    '}': '{',
+    '>': '<',
+};
+
 function part1(input) {
+
+    const SCORE_MAP = {
+        ')': 3,
+        ']': 57,
+        '}': 1197,
+        '>': 25137,
+    };
+
     let score = 0;
-    // eslint-disable-next-line no-restricted-syntax
     outer: for (const line of input) {
         const stack = [];
         for (const char of line) {
-            // eslint-disable-next-line default-case
             switch (char) {
                 case '(':
                 case '[':
@@ -55,29 +68,11 @@ function part1(input) {
                     break;
 
                 case ')':
-                    if (stack.pop() !== '(') {
-                        score += 3;
-                        continue outer;
-                    }
-                    break;
-
                 case ']':
-                    if (stack.pop() !== '[') {
-                        score += 57;
-                        continue outer;
-                    }
-                    break;
-
                 case '}':
-                    if (stack.pop() !== '{') {
-                        score += 1197;
-                        continue outer;
-                    }
-                    break;
-
                 case '>':
-                    if (stack.pop() !== '<') {
-                        score += 25137;
+                    if (stack.pop() !== OPENER_MAP[char]) {
+                        score += SCORE_MAP[char];
                         continue outer;
                     }
                     break;
@@ -92,7 +87,6 @@ function part2(input) {
     const incomplete = input.map(line => {
         const stack = [];
         for (const char of line) {
-            // eslint-disable-next-line default-case
             switch (char) {
                 case '(':
                 case '[':
@@ -102,25 +96,10 @@ function part2(input) {
                     break;
 
                 case ')':
-                    if (stack.pop() !== '(') {
-                        return false;
-                    }
-                    break;
-
                 case ']':
-                    if (stack.pop() !== '[') {
-                        return false;
-                    }
-                    break;
-
                 case '}':
-                    if (stack.pop() !== '{') {
-                        return false;
-                    }
-                    break;
-
                 case '>':
-                    if (stack.pop() !== '<') {
+                    if (stack.pop() !== OPENER_MAP[char]) {
                         return false;
                     }
                     break;
@@ -128,27 +107,20 @@ function part2(input) {
         }
         return stack;
     })
-        .filter(x => x);
+    .filter(x => x);
+
+    const SCORE_MAP = {
+        '(': 1,
+        '[': 2,
+        '{': 3,
+        '<': 4,
+    };
 
     const linescores = incomplete.map(line => {
         let score = 0;
         line.reverse();
         for (const char of line) {
-            // eslint-disable-next-line default-case
-            switch (char) {
-                case '(':
-                    score = (score * 5) + 1;
-                    break;
-                case '[':
-                    score = (score * 5) + 2;
-                    break;
-                case '{':
-                    score = (score * 5) + 3;
-                    break;
-                case '<':
-                    score = (score * 5) + 4;
-                    break;
-            }
+            score = (score * 5) + SCORE_MAP[char];
         }
         return score;
     });
