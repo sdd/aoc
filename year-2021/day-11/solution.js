@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
@@ -52,16 +53,13 @@ const ADJ_MAP = [
 function part1(input) {
     input = _.cloneDeep(input); // Missing this out caused me so much pain
     let flashCount = 0;
+
     for (let step = 1; step <= 100; step++) {
         const flashSet = new Set();
-        for(let y = 0; y < input.length; y++) {
-            for(let x = 0; x< input.length; x++) {
-
+        for(let y = 0; y < 10; y++) {
+            for(let x = 0; x < 10; x++) {
                 if (!flashSet.has(`${x}_${y}`)) {
-                    input[y][x] += 1;
-                    const cell = input[y][x];
-
-                    if (cell > 9) {
+                    if (++input[y][x] > 9) {
                         flashCount += flash(input, x, y, flashSet);
                     }
                 }
@@ -73,15 +71,14 @@ function part1(input) {
 }
 
 function flash(map, x, y, flashSet) {
-    let flashCount = 1;
     map[y][x] = 0;
+    let flashCount = 1;
     flashSet.add(`${x}_${y}`);
 
     for (const a of ADJ_MAP) {
-        if (y + a[1] >= 0 && x + a[0] >= 0 && y + a[1] < map.length && x + a[0] < map[0].length) {
+        if (y + a[1] >= 0 && x + a[0] >= 0 && y + a[1] < 10 && x + a[0] < 10) {
             if (!flashSet.has(`${x+a[0]}_${y+a[1]}`)) {
-                map[y + a[1]][x + a[0]]++;
-                if (map[y + a[1]][x + a[0]] > 9) {
+                if (++map[y + a[1]][x + a[0]] > 9) {
                     flashCount += flash(map, x + a[0], y + a[1], flashSet);
                 }
             }
@@ -92,29 +89,25 @@ function flash(map, x, y, flashSet) {
 }
 
 function part2(input) {
-    let flashSet = new Set();
-    let numFlashedThisStep = 0;
-    
-    let step = 1;
-    while (step < 1000) {
+    let flashCount;
+    let flashSet;
+
+    let step = 0;
+    while (++step < 1000) {
         flashSet = new Set();
-        numFlashedThisStep = 0;
-        for(let y = 0; y < input.length; y++) {
-            for(let x = 0; x < input.length; x++) {
-
+        flashCount = 0;
+        for(let y = 0; y < 10; y++) {
+            for(let x = 0; x < 10; x++) {
                 if (!flashSet.has(`${x}_${y}`)) {
-                    input[y][x] += 1;
-
-                    if (input[y][x] > 9) {
-                        numFlashedThisStep += flash(input, x, y, flashSet);
-                        if (numFlashedThisStep === input.length * input[0].length) {
+                    if (++input[y][x] > 9) {
+                        flashCount += flash(input, x, y, flashSet);
+                        if (flashCount === 100) {
                             return step;
                         }
                     }
                 }
             }
         }
-        step++;
     }
 }
 
