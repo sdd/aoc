@@ -30,7 +30,7 @@ function showSolvePrompt(state) {
             options.push({ key: '1', msg: 'submit part 1', color: 'bgRed' });
         }
     }
-    if (!state.history?.rightAnswers?.part1 && isSubmittable(state.latestAnswers[1])) {
+    if (!state.history?.rightAnswers?.part2 && isSubmittable(state.latestAnswers[1])) {
         const prevBadAnswers = state.history.wrongAnswers.part2.map(x => x.answer);
         if (!prevBadAnswers.includes(`${state.latestAnswers[1]}`)) {
             options.push({ key: '2', msg: 'submit part 2', color: 'bgRed' });
