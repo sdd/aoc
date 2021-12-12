@@ -50,7 +50,7 @@ function solveOnce(state, examplesOnly = false) {
                 const ex2p1res = soln.part1(soln.parse(input));
                 const ex2p2res = soln.part2(soln.parse(input));
                 state.ex2p1Correct = ex2p1res === soln.ex2expectedP1;
-                state.ex2p1Correct = ex2p2res === soln.ex2expectedP2;
+                state.ex2p2Correct = ex2p2res === soln.ex2expectedP2;
                 d('ex2 part1 result: %o (expected: %o) %s', ex2p1res, soln.ex2expectedP1, state.ex2p1Correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
                 d('ex2 part2 result: %o (expected: %o) %s', ex2p2res, soln.ex2expectedP2, state.ex2p2Correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
             }

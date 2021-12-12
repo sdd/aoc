@@ -125,7 +125,7 @@ function paint2D(arr) {
 function for2D(arr, fn, {
     xCond = x => x < arr.length,
     yCond = y => y < arr[0].length
-}) {
+} = {}) {
     for(let i = 0; xCond(i); i++) {
         for(let j = 0; yCond(j); j++) {
             fn(i, j, arr);
