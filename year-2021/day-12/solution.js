@@ -40,37 +40,26 @@ start-RW`;
 const ex2expectedP1 = 226;
 const ex2expectedP2 = 3509;
 
-/**
- * Input parser.
- * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
- */
-function parse({ raw, line, comma, space, multi }) {
-    const lines = line.map(l => l.split('-'));
-
-    const lineMap = new Map();
-    for (const [start, end] of lines) {
-        if (end !== 'start') {
-            if (!lineMap.has(start)) {
-                lineMap.set(start, [end]);
-            } else {
-                lineMap.set(start, [...lineMap.get(start), end]);
-            }
-        }
-
-        if (start !== 'start') {
-            if (!lineMap.has(end)) {
-                lineMap.set(end, [start]);
-            } else {
-                lineMap.set(end, [...lineMap.get(end), start]);
-            }
+class Graph extends Map {
+    addEdge(a, b) {
+        if (!super.has(a)) {
+            super.set(a, [b]);
+        } else {
+            super.set(a, [...super.get(a), b]);
         }
     }
+}
 
-    return lineMap;
+function parse({ raw, line, comma, space, multi }) {
+    const edges = line.map(l => l.split('-'));
+
+    const graph = new Graph();
+    for (const [a, b] of edges) {
+        if (b !== 'start') graph.addEdge(a, b);
+        if (a !== 'start') graph.addEdge(b, a);
+    }
+
+    return graph;
 }
 
 function part1(input) {
@@ -82,51 +71,48 @@ function part2(input) {
 }
 
 function partx(graph, canSecondVisitOne = false) {
-    const completePaths = [];
+    let completePathCount = 0;
 
-    const inProgPaths = [['start']];
-    while(inProgPaths.length) {
-        const currPath = inProgPaths.pop();
+    const pathQueue = [['start']];
+    while(pathQueue.length) {
+        const currPath = pathQueue.pop();
         const currLoc = currPath[currPath.length - 1];
 
         if (currLoc === 'end') {
-            completePaths.push(currPath);
+            completePathCount++;
         } else {
-            for (const possNext of graph.get(currLoc)) {
+            for (const next of graph.get(currLoc)) {
                 if (
-                    possNext !== possNext.toLowerCase()
-                    || !currPath.includes(possNext)
-                    || (canSecondVisitOne && canSecondVisit(currPath, possNext))
+                    next !== next.toLowerCase()
+                    || !currPath.includes(next)
+                    || (canSecondVisitOne && canSecondVisit(currPath, next))
                 ) {
-                    inProgPaths.push([...currPath, possNext]);
+                    pathQueue.push([...currPath, next]);
                 }
             }
         }
     }
 
-    return completePaths.length;
+    return completePathCount;
 }
 
-function canSecondVisit(currPath, possNext) {
-    const lowerVisits = currPath.filter(
+function canSecondVisit(currPath, next) {
+    const lowerCaseVisited = currPath.filter(
         x => (x === x.toLowerCase() && x !== 'end' && x !== 'start')
     );
 
     const visited = new Set();
-    let doubled = false;
+    let haveDoubleVisited = false;
 
-    for (const v of lowerVisits) {
-        if (!visited.has(v)) {
-            visited.add(v);
-        } else if (!doubled) {
-            doubled = true;
-        } else {
-            console.log('NOOOOOOOOOOOOOOOOOOOOOOOO')
-            return false;
+    for (const node of lowerCaseVisited) {
+        if (!visited.has(node)) {
+            visited.add(node);
+        } else if (!haveDoubleVisited) {
+            haveDoubleVisited = true;
         }
     }
 
-    return !doubled || !visited.has(possNext);
+    return !haveDoubleVisited || !visited.has(next);
 }
 
 module.exports = {
