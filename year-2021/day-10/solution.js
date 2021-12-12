@@ -47,7 +47,6 @@ const OPENER_MAP = {
 };
 
 function part1(input) {
-
     const SCORE_MAP = {
         ')': 3,
         ']': 57,

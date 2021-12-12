@@ -1,3 +1,4 @@
+/* eslint-disable prefer-destructuring */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
@@ -22,7 +23,7 @@ Player 2:
 10
 `;
 const ex1expectedP1 = 306;
-const ex1expectedP2 = ``;
+const ex1expectedP2 = 291;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
@@ -58,7 +59,7 @@ function part1(input) {
         }
     }
 
-    let winner = input[0].length ? input[0] : input[1];
+    const winner = input[0].length ? input[0] : input[1];
     return _.sum(winner.reverse().map((v, i) => v * (i+1)));
 }
 
@@ -69,15 +70,14 @@ function hashDecks(deck1,deck2) {
 function part2(input) {
 
     function recursiveCombat(deck1, deck2) {
-        let prevConfigs = new Set();
+        const prevConfigs = new Set();
 
         while(deck1.length && deck2.length) {
-            let deckHash = hashDecks(deck1, deck2);
+            const deckHash = hashDecks(deck1, deck2);
             if (prevConfigs.has(deckHash)) {
                 return [1, deck1];
-            } else {
-                prevConfigs.add(deckHash);
-            }
+            } 
+            prevConfigs.add(deckHash);
 
             const p1 = deck1.shift();
             const p2 = deck2.shift();
@@ -98,7 +98,7 @@ function part2(input) {
             }
         }
 
-        let winner = deck1.length ? deck1 : deck2;
+        const winner = deck1.length ? deck1 : deck2;
         return [deck1.length ? 1 : 2, _.sum(winner.reverse().map((v, i) => v * (i+1)))];
     }
 
