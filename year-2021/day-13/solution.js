@@ -54,108 +54,68 @@ function parse({ raw, line, comma, space, multi }) {
         const last = frags[frags.length - 1];
         const [axis, val] = last.split('=');
         return { axis, val: Number(val) };
-    })
+    });
 
-    return { dots, folds };
-}
-
-function part1({ dots, folds }) {
     const maxX = _.max(dots.map(dot => dot[0])) + 1;
     const maxY = _.max(dots.map(dot => dot[1])) + 1;
 
     const paper = util.array2D(maxY, maxX);
+
     for(const dot of dots) {
-        paper[dot[1]][dot[0]] = '#';
+        paper[dot[1]][dot[0]] = 1;
     }
 
-    const { axis, val } = folds[0];
+    return { paper, folds };
+}
+
+function part1({ paper, folds }) {
+    const newPaper = doFold(paper, folds[0]);
+    return _.sum(_.flatten(newPaper));
+}
+
+function part2({ paper, folds }) {
+    paper = folds.reduce(doFold, paper);
+    
+    util.paint2D(paper);
+    return false;
+}
+
+function doFold(paper, { axis, val }) {
     let newPaper;
+    
     if (axis === 'y') {
-        newPaper = util.array2D(val + 1, paper[0].length);
+        const overlap = -Math.min(0, paper.length - (2 * val) + 1);
+        newPaper = util.array2D(val + overlap, paper[0].length);
 
         for(let y = 0; y < val; y++) {
             for(let x = 0; x < paper[0].length; x++) {
-                newPaper[y][x] = paper[y][x];
+                newPaper[y + overlap][x] = paper[y][x];
             }
         }
-        for(let yo = val, yn = val; yo < paper.length; yo++, yn--) {
+
+        for(let yo = val + 1, yn = newPaper.length - 1; yo < paper.length; yo++, yn--) {
             for(let x = 0; x < paper[0].length; x++) {
                 newPaper[yn][x] = newPaper[yn][x] || paper[yo][x];
             }
         }
-    } else if (axis === 'x') {
-        newPaper = util.array2D(paper.length, val + 1);
+    } else {
+        const overlap = -Math.min(0, paper[0].length - (2 * val) + 1);
+        newPaper = util.array2D(paper.length, val + overlap);
 
         for(let y = 0; y < paper.length; y++) {
             for(let x = 0; x < val; x++) {
-                newPaper[y][x] = paper[y][x];
+                newPaper[y][x + overlap] = paper[y][x];
             }
         }
+
         for(let y = 0; y < paper.length; y++) {
-            for(let xo = val, xn = val; xo < paper[0].length; xo++, xn--) {
+            for(let xo = val + 1, xn = newPaper[0].length - 1; xo < paper[0].length; xo++, xn--) {
                 newPaper[y][xn] = newPaper[y][xn] || paper[y][xo];
             }
         }
     }
 
-    let count = 0;
-    for(let y = 0; y < newPaper.length; y++) {
-        for(let x = 0; x < newPaper[0].length; x++) {
-            if (newPaper[y][x]) { count++; }
-        }
-    }
-
-    return count;
-}
-
-function part2({ dots, folds }) {
-    const maxX = _.max(dots.map(dot => dot[0])) + 1;
-    const maxY = _.max(dots.map(dot => dot[1])) + 1;
-
-    let paper = util.array2D(maxY, maxX);
-    for(const dot of dots) {
-        paper[dot[1]][dot[0]] = '#';
-    }
-    let newPaper;
-    
-    for (const fold of folds) {
-        const { axis, val } = fold;
-        if (axis === 'y') {
-            const overlap = Math.min(0, paper.length - (2 * val) + 1);
-            newPaper = util.array2D(val - overlap, paper[0].length);
-
-            for(let y = 0; y < val; y++) {
-                for(let x = 0; x < paper[0].length; x++) {
-                    newPaper[y - overlap][x] = paper[y][x];
-                }
-            }
-
-            for(let yo = val + 1, yn = newPaper.length - 1; yo < paper.length && yn >= 0; yo++, yn--) {
-                for(let x = 0; x < paper[0].length; x++) {
-                    newPaper[yn][x] = newPaper[yn][x] || paper[yo][x];
-                }
-            }
-        } else if (axis === 'x') {
-            const overlap = Math.min(0, paper[0].length - (2 * val) + 1);
-            newPaper = util.array2D(paper.length, val - overlap);
-
-            for(let y = 0; y < paper.length; y++) {
-                for(let x = 0; x < val; x++) {
-                    newPaper[y][x - overlap] = paper[y][x];
-                }
-            }
-
-            for(let y = 0; y < paper.length; y++) {
-                for(let xo = val + 1, xn = newPaper[0].length - 1; xo < paper[0].length && xn >= 0; xo++, xn--) {
-                    newPaper[y][xn] = newPaper[y][xn] || paper[y][xo];
-                }
-            }
-        }
-        paper = newPaper;
-    }
-    util.paint2D(newPaper);
-
-    return false;
+    return newPaper;
 }
 
 module.exports = {
