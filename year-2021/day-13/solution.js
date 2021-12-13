@@ -69,13 +69,14 @@ function parse({ raw, line, comma, space, multi }) {
 }
 
 function part1({ paper, folds }) {
-    const newPaper = doFold(paper, folds[0]);
-    return _.sum(_.flatten(newPaper));
+    paper = doFold(paper, folds[0]);
+
+    return _.sum(_.flatten(paper));
 }
 
 function part2({ paper, folds }) {
     paper = folds.reduce(doFold, paper);
-    
+
     util.paint2D(paper);
     return false;
 }
@@ -84,33 +85,23 @@ function doFold(paper, { axis, val }) {
     let newPaper;
     
     if (axis === 'y') {
-        const overlap = -Math.min(0, paper.length - (2 * val) + 1);
-        newPaper = util.array2D(val + overlap, paper[0].length);
+        newPaper = util.array2D(val, paper[0].length);
 
-        for(let y = 0; y < val; y++) {
-            for(let x = 0; x < paper[0].length; x++) {
-                newPaper[y + overlap][x] = paper[y][x];
-            }
-        }
+        const isEven = paper.length % 2 === 0;
 
-        for(let yo = val + 1, yn = newPaper.length - 1; yo < paper.length; yo++, yn--) {
+        for(let y = (isEven ? 1 : 0); y < val; y++) {
             for(let x = 0; x < paper[0].length; x++) {
-                newPaper[yn][x] = newPaper[yn][x] || paper[yo][x];
+                newPaper[y][x] = paper[y][x]
+                || paper[paper.length - y - (isEven ? 0 : 1)][x];
             }
         }
     } else {
-        const overlap = -Math.min(0, paper[0].length - (2 * val) + 1);
-        newPaper = util.array2D(paper.length, val + overlap);
+        newPaper = util.array2D(paper.length, val);
 
         for(let y = 0; y < paper.length; y++) {
             for(let x = 0; x < val; x++) {
-                newPaper[y][x + overlap] = paper[y][x];
-            }
-        }
-
-        for(let y = 0; y < paper.length; y++) {
-            for(let xo = val + 1, xn = newPaper[0].length - 1; xo < paper[0].length; xo++, xn--) {
-                newPaper[y][xn] = newPaper[y][xn] || paper[y][xo];
+                newPaper[y][x] = paper[y][x]
+                || paper[y][paper[0].length - x - 1];
             }
         }
     }
