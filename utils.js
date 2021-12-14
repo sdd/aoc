@@ -1,24 +1,6 @@
 const _ = require('lodash');
 const chalk = require('chalk');
 
-module.exports = {
-    array2D,
-    for2D,
-    ints,
-    list2map,
-    minIndexBy,
-    maxIndexBy,
-    paint2D,
-    posints,
-    posInts: posints,
-
-    conwayStep,
-    conwaySteps,
-    adjCountHex,
-
-    arrayCount
-};
-
 const REGEX_INTS = /-?\d+/g;
 const REGEX_POSITIVE_INTS = /\d+/g;
 
@@ -187,3 +169,98 @@ function adjCountHex(world, x, y) {
     }
     return count;
 }
+
+/**
+ * Counter: counts the frequencies of items
+ */
+class Counter extends Map {
+
+    /**
+     * adds value to the count of key
+     * @param {any} key 
+     * @param {any} value 
+     * @returns Counter
+     */
+    add(key, value) {
+        if (!this.has(key)) {
+            return this.set(key, value);
+        }
+        return this.set(key, this.get(key) + value);
+    };
+
+    /**
+     * increments the count of key
+     * @param {any} key 
+     * @returns Counter
+     */
+    inc(key) {
+        return this.add(key, 1);
+    }
+
+    /**
+     * 
+     * @returns a sorted array of entries
+     */
+    sortedEntries() {
+        const entries = [...this.entries()];
+        entries.sort((a, b) => a[1] - b[1]);
+        return entries;
+    }
+
+    /**
+     * 
+     * @returns the frequency of the most common entry
+     */
+    maxVal() {
+        return this.sortedEntries().pop()[1];
+    }
+
+    /**
+     * 
+     * @returns the frequency of the least common entry
+     */
+    minVal() {
+        return this.sortedEntries()[0][1];
+    }
+
+    /**
+     * 
+     * @returns the difference between the most and least common entries
+     */
+    valRange() {
+        return this.maxVal() - this.minVal();
+    }
+}
+
+/**
+ * 
+ * @param {iterable} iterable (incl Strings)
+ * @returns a Counter initialised to the frequencies in iterable
+ */
+Counter.from = iterable => {
+    const freq = new Counter();
+    for (const item of iterable) {
+        freq.inc(item);
+    }
+    return freq;
+}
+
+module.exports = {
+    Counter,
+
+    array2D,
+    for2D,
+    ints,
+    list2map,
+    minIndexBy,
+    maxIndexBy,
+    paint2D,
+    posints,
+    posInts: posints,
+
+    conwayStep,
+    conwaySteps,
+    adjCountHex,
+
+    arrayCount
+};

@@ -1,7 +1,7 @@
 const d = require('debug')('solution');
 const _ = require('lodash');
 
-const util = require('../../utils');
+const { Counter } = require('../../utils');
 const imp = require('../../imp');
 const parsers = require('../../parse');
 
@@ -26,7 +26,7 @@ BC -> B
 CC -> N
 CN -> C`;
 const ex1expectedP1 = 1588;
-const ex1expectedP2 = ``;
+const ex1expectedP2 = 2188189693529;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
@@ -43,106 +43,50 @@ const ex2expectedP2 = ``;
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
-    let [template, rules] = multi;
-
-    rules = rules.map(r => r.split(' -> ')).reduce((map, [k, v]) => {
-        map.set(k, v);
-        return map;
-    }, new Map());
+    const [[template], rules] = multi;
 
     return {
-        template: template[0], rules
+        template,
+        rules: new Map(rules.map(r => r.split(' -> ')))
     };
 }
 
 function part1({template, rules}) {
     let current = template;
-    let next = '';
     for(let step = 1; step <= 10; step++) {
+        let next = '';
         for(let pos = 0; pos <= current.length - 2; pos++) {
-            const currPair = current.slice(pos, pos+2);
-            const rule = rules.get(currPair);
-            next += `${current[pos]}${rule}`;
+            next += current[pos] + rules.get(current.slice(pos, pos+2));
         }
-        next += current.charAt(current.length - 1);
-        current = next;
-        next = '';
-    }
-    
-
-    const cc = current.split('');
-    const freq = new Map();
-    for (const char of cc) {
-        if (!freq.has(char)) {
-            freq.set(char, 1);
-        } else {
-            freq.set(char, freq.get(char) + 1);
-        }
+        current = next + current.slice(-1);
     }
 
-    const freqEnt = [...freq.entries()];
-
-    freqEnt.sort((a, b) => a[1] - b[1]);
-
-    const a = freqEnt[0];
-    const b = freqEnt[freqEnt.length - 1];
-    console.log(a, b);
-
-    return b[1] - a[1];
+    return Counter.from(current).valRange();
 }
 
 function part2({template, rules }) {
-    let current = new Map();
+    let current = new Counter();
     for(let pos = 0; pos <= template.length - 2; pos++) {
-        const currPair = template.slice(pos, pos+2);
-        if (!current.has(currPair)) {
-            current.set(currPair, 1);
-        } else {
-            current.set(currPair, current.get(currPair) + 1);
-        }
+        current.inc(template.slice(pos, pos+2));
     }
-    let next;
 
     for(let step = 1; step <= 40; step++) {
-        next = new Map();
-
-        for(const [key, count] of current.entries()) {
+        const next = new Counter();
+        for(const [key, count] of current) {
             const nextChar = rules.get(key);
-            const next1 = `${key.charAt(0)}${nextChar}`;
-            const next2 = `${nextChar}${key.charAt(1)}`;
-
-            if (!next.has(next1)) {
-                next.set(next1, count);
-            } else {
-                next.set(next1, next.get(next1) + count);
-            }
-
-            if (!next.has(next2)) {
-                next.set(next2, count);
-            } else {
-                next.set(next2, next.get(next2) + count);
-            }
+            next.add(`${key[0]}${nextChar}`, count);
+            next.add(`${nextChar}${key[1]}`, count);
         }
         current = next;
     }    
 
-    const freqEnt = [...current.entries()];
-    const fc = new Map();
-
-    for (const [pair, count] of freqEnt) {
-        const first = pair.charAt(0);
-        if (!fc.has(first)) {
-            fc.set(first, count);
-        } else {
-            fc.set(first, fc.get(first) + count);
-        }
+    const freqs = new Counter();
+    for (const [pair, count] of current) {
+        freqs.add(pair[0], count);
     }
-    const lastInputChar = template.charAt(template.length - 1);
-    fc.set(lastInputChar, fc.get(lastInputChar) + 1);
+    freqs.inc(template.slice(-1));
 
-    const freqs = [...fc.entries()];
-    freqs.sort((a, b) => a[1] - b[1]);
-    return freqs.pop()[1] - freqs[0][1];
+    return freqs.valRange();
 }
 
 module.exports = {
