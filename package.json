@@ -22,6 +22,7 @@
     "enquirer": "^2.3.6",
     "fs-extra": "^9.0.1",
     "got": "^11.8.0",
+    "javascript-astar": "^0.4.1",
     "lodash": "^4.17.20",
     "md5": "^2.3.0",
     "mocha": "^8.2.1",
