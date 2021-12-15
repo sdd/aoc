@@ -1,6 +1,6 @@
+/* eslint-disable no-continue */
 const d = require('debug')('solution');
 const _ = require('lodash');
-const { Graph, astar } = require('javascript-astar');
 
 const util = require('../../utils');
 const imp = require('../../imp');
@@ -23,12 +23,12 @@ const ex1expectedP2 = 315;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
-const ex2 = `8`;
+const ex2 = ``;
 const ex2expectedP1 = ``;
 const ex2expectedP2 = ``;
 
 const { array2D } = require('../../utils');
-const utils = require('../../utils');
+const { createNode, search } = require('../../astar');
 
 /**
  * Input parser.
@@ -46,11 +46,11 @@ function part1(input) {
     const width = input[0].length;
     const height = input.length;
 
-    const graph = new Graph(input);
+    const grid = array2D(width, height, (y, x) => createNode(x, y, input[y][x]));
 
-	const start = graph.grid[0][0];
-	const end = graph.grid[height - 1][width - 1];
-	const result = astar.search(graph, start, end);
+    const start = grid[0][0];
+    const end = grid[height - 1][width - 1];
+    const result = search(grid, start, end);
 
     return _.sum(result.map(n => n.weight));
 }
@@ -62,19 +62,19 @@ function part2(input) {
     const fwidth = width * 5
     const fheight = height * 5;
 
-    const finalGrid = array2D(fwidth, fheight, (i, j) => {
-        const cellx = Math.floor(j / width);
-        const celly = Math.floor(i / height);
+    const grid = array2D(fwidth, fheight, (y, x) => {
+        const cellx = Math.floor(x / width);
+        const celly = Math.floor(y / height);
         const added = cellx + celly;
 
-        return ((input[i % height][j % width] + added - 1) % 9) + 1;
+        const weight = ((input[y % height][x % width] + added - 1) % 9) + 1;
 
-    })
-    const graph = new Graph(finalGrid);
+        return createNode(x, y, weight);
+    });
 
-    const start = graph.grid[0][0];
-	const end = graph.grid[fheight - 1][fwidth - 1];
-	const result = astar.search(graph, start, end);
+    const start = grid[0][0];
+    const end = grid[fheight - 1][fwidth - 1];
+    const result = search(grid, start, end);
 
     return _.sum(result.map(n => n.weight));
 }
