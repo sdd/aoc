@@ -52,7 +52,7 @@ function part1(input) {
     const end = grid[height - 1][width - 1];
     const result = search(grid, start, end);
 
-    return _.sum(result.map(n => n.weight));
+    return _.sum(_.map(result, 'weight'));
 }
 
 function part2(input) {
@@ -76,7 +76,7 @@ function part2(input) {
     const end = grid[fheight - 1][fwidth - 1];
     const result = search(grid, start, end);
 
-    return _.sum(result.map(n => n.weight));
+    return _.sum(_.map(result, 'weight'));
 }
 
 module.exports = {
