@@ -10,6 +10,7 @@ anyhow = "1.0.51"
 howlong = "0.1.7"
 itertools = "0.10.1"
 peg = "0.7.0"
+priority-queue = "1.2.1"
 rayon = "1.5.1"
 regex = "1.5.4"
 
@@ -42,3 +43,8 @@ path = "day-06/solution.rs"
 [[bin]]
 name = "day-07"
 path = "day-07/solution.rs"
+
+
+[[bin]]
+name = "day-15"
+path = "day-15/solution.rs"
