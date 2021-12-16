@@ -5,6 +5,7 @@ use std::borrow::BorrowMut;
 use std::cell::{RefCell};
 use std::cmp::Ordering;
 use std::ops::{Deref, Neg};
+use std::time::Instant;
 use priority_queue::PriorityQueue;
 
 #[derive(Copy, Clone, PartialEq, Debug)]
@@ -169,6 +170,7 @@ pub fn manhattan(a: &Node, b: &Node) -> f64 {
 }
 
 fn main() {
+    let start = Instant::now();
     let raw = include_str!("input-01.txt");
     // let raw = include_str!("example-01.txt");
 
@@ -178,6 +180,7 @@ fn main() {
     let width = raw_grid.len();
     let height = raw_grid[0].len();
 
+    // build Grid object for part 1
     let nodes: Vec<RefCell<Node>> = raw.lines().enumerate().map(move |(y, row)|
         row.chars().enumerate().filter_map(move |(x, char)|
             char.to_digit(10).map(move |weight|
@@ -188,12 +191,16 @@ fn main() {
     .collect();
     let mut grid: Grid = Grid { nodes, width, height };
 
+    // calc the path for part 1
     let path = grid.shortest_path(0, width * height - 1);
 
-    let dist: u32 = path.iter().map(|&idx| grid.nodes.get(idx).unwrap().borrow().weight).sum();
-    let dist = dist - grid.nodes[0].borrow().weight as u32 + grid.nodes[width * height - 1].borrow().weight as u32;
-    println!("part1: {dist:?}");
+    let risk = calc_path_risk(width, height, &mut grid, path);
+    println!("part1: {risk:?}");
+    println!("elapsed: {}ms", start.elapsed().as_millis());
 
+    let start = Instant::now();
+
+    // build the Grid object for part 2
     let full_width = width * 5;
     let full_height = height * 5;
     let mut full_nodes = vec![];
@@ -211,9 +218,17 @@ fn main() {
     }
     let mut full_grid: Grid = Grid { nodes: full_nodes, width: full_width, height: full_height };
 
+    // calc the path for part 1
     let path = full_grid.shortest_path(0, full_width * full_height - 1);
 
-    let dist: u32 = path.iter().map(|&idx| full_grid.nodes.get(idx).unwrap().borrow().weight).sum();
-    let dist = dist - full_grid.nodes[0].borrow().weight as u32 + full_grid.nodes[full_width * full_height - 1].borrow().weight as u32;
-    println!("part2: {dist:?}");
+    let risk = calc_path_risk(full_width, full_height, &mut full_grid, path);
+    println!("part2: {risk:?}");
+    println!("elapsed: {}ms", start.elapsed().as_millis());
+}
+
+pub fn calc_path_risk(width: usize, height: usize, grid: &mut Grid, path: Vec<usize>) -> u32 {
+    let dist: u32 = path.iter().map(|&idx| grid.nodes.get(idx).unwrap().borrow().weight).sum();
+
+    // adjust dist to remove weight for start and add weight for end
+    dist - grid.nodes[0].borrow().weight as u32 + grid.nodes[width * height - 1].borrow().weight as u32
 }
