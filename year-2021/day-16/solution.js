@@ -18,18 +18,6 @@ const ex2 = `9C0141080250320F1802104A08`;
 const ex2expectedP1 = 20;
 const ex2expectedP2 = 1;
 
-/**
- * Input parser.
- * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
- */
-function parse({ raw, line, comma, space, multi }) {
-    return line[0];
-}
-
 const HEX_MAP = {
     '0': '0000',
     '1': '0001',
@@ -49,29 +37,26 @@ const HEX_MAP = {
     'F': '1111',
 };
 
-const TYPE_MAP = {
-    0: 'SUM',
-    1: 'PRODUCT',
-    2: 'MIN',
-    3: 'MAX',
-    4: 'LITERAL',
-    5: 'GT',
-    6: 'LT',
-    7: 'EQ'
-};
+/**
+ * Input parser.
+ * @param {raw} raw unmodified input string from input-01.txt
+ * @param {line} raw split on newlines, empty items removed, items trimmed
+ * @param {comma} raw split on commas, empty items removed, items trimmed
+ * @param {space} raw split on spaces, empty lines removed, items trimmed
+ * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
+ */
+function parse({ raw, line, comma, space, multi }) {
+    const chars = line[0].slice().split('');
+    return chars.map(x => HEX_MAP[x]).join('').split('');
+}
 
-const LITERAL = 4;
-
-function part1(input) {
-    input = input.slice();
-    const chars = input.split('');
-
-    let binary = chars.map(x => HEX_MAP[x]).join('').split('');
+function part1(binary) {
+    binary = binary.slice();
     const packets = [];
+    let packet;
     while(binary.length) {
-        const [packet, remainingBinary] = parsePacket(binary);
+        ([packet, binary] = parsePacket(binary));
         packets.push(packet);
-        binary = remainingBinary;
     }
 
     return sumVersion(packets);
@@ -88,119 +73,85 @@ function sumVersion(packets) {
     return sum;
 }
 
+function binTakeInt(binary, digits) {
+    return parseInt(binary.splice(0, digits).join(''), 2);
+}
+
 function parsePacket(binary) {
-    // d('parsePacket start: %o', binary);
-    const packet = {};
-    packet.version = parseInt(binary.splice(0, 3).join(''), 2);
-    packet.type = parseInt(binary.splice(0, 3).join(''), 2);
-    // d('version: %o, type: %o (%o)', packet.version, packet.type, TYPE_MAP[packet.type]);
-    if (Number.isNaN(packet.version) || Number.isNaN(packet.type)) {
-        d('bad header');
-        return [packet, binary];
-    }
+    const packet = {
+        subPackets: [],
+        version: binTakeInt(binary, 3),
+        type: binTakeInt(binary, 3)
+    };
+    let subPacket;
 
     switch (packet.type) {
-        case LITERAL:
-            const digits = [];
+        case 4: // LITERAL
+            let digits = [];
             while(binary.splice(0, 1)[0] === '1') {
-                digits.push(binary.splice(0, 4));
+                digits = digits.concat(binary.splice(0, 4));
             }
-            digits.push(binary.splice(0, 4));
-            packet.digits = digits;
-            packet.value = parseInt(_.flatten(digits).join(''), 2);
+            digits = digits.concat(binary.splice(0, 4));
+            packet.value = binTakeInt(digits, digits.length);
             break;
         
-        default:
-            // OPERATOR
+        default: // OPERATOR
             packet.lengthType = binary.splice(0, 1)[0];
-            // d('lengthtype: %o', packet.lengthType);
 
-            if (packet.lengthType === '0') {
-                // 15 bit length
-                const rawLen = binary.splice(0, 15).join('');
-                packet.length = parseInt(rawLen, 2);
-                if (Number.isNaN(packet.length)) {
-                    d('could not parse length %o', packet.length);
-                    return [packet, binary];
-                }
-                // d('parsing subpackets of length %o', packet.length);
+            if (packet.lengthType === '0') { // 15 bit length
+                packet.length = binTakeInt(binary, 15);
+                
                 let subBinary = binary.splice(0, packet.length);
-                packet.subPackets = [];
                 while(subBinary.length) {
-                    const [subPacket, remainingBinary] = parsePacket(subBinary);
+                    ([subPacket, subBinary] = parsePacket(subBinary));
                     packet.subPackets.push(subPacket);
-                    subBinary = remainingBinary;
                 }
-            } else if (packet.lengthType === '1') { 
-                // 11 bit packet quantity
-                const rawNum = binary.splice(0, 11).join('');
-                packet.numSubpackets = parseInt(rawNum, 2);
-                if (Number.isNaN(packet.numSubpackets)) {
-                    d('could not parse numSubpackets %o', rawNum);
-                    return [packet, binary];
-                }
-                // d('parsing %o subpackets', packet.numSubpackets);
+
+            } else { // 11 bit packet quantity
+                packet.numSubpackets = binTakeInt(binary, 11);
+                
                 let packetsLeft = packet.numSubpackets;
-                packet.subPackets = [];
                 while(packetsLeft-- > 0) {
-                    const [subPacket, remainingBinary] = parsePacket(binary);
+                    ([subPacket, binary] = parsePacket(binary));
                     packet.subPackets.push(subPacket);
-                    binary = remainingBinary;
                 }
-            } else {
-                d('bad packet length type');
             }
     }
     return [packet, binary];
 }
 
 function part2(input) {
-    input = input.slice();
-    const chars = input.split('');
-
-    let binary = chars.map(x => HEX_MAP[x]).join('').split('');
-    const packets = [];
-    while(binary.length) {
-        const [packet, remainingBinary] = parsePacket(binary);
-        packets.push(packet);
-        binary = remainingBinary;
-    }
-
-    return evalPacket(packets[0]);
+    return evalPacket(parsePacket(input)[0]);
 }
 
 function evalPacket(packet) {
+    if (packet.type === 4) {
+        return packet.value;
+    }
+
+    const subPacketVals = packet.subPackets.map(evalPacket);
+
     switch (packet.type) {
         case 0:  // SUM
-            return _.sum(packet.subPackets.map(evalPacket));
+            return _.sum(subPacketVals);
 
         case 1: // PRODUCT
-            const [first, ...rest] = packet.subPackets;
-            return rest.reduce(
-                (acc, val) => (acc * evalPacket(val)),
-                evalPacket(first)
-            );
+            return _.reduce(subPacketVals, _.multiply);
 
         case 2: // MIN
-            return _.min(packet.subPackets.map(evalPacket));
+            return _.min(subPacketVals);
 
         case 3: // MAX
-            return _.max(packet.subPackets.map(evalPacket));
-
-        case 4: // LITERAL
-            return packet.value;
+            return _.max(subPacketVals);
 
         case 5: // GT
-            const [a, b] = packet.subPackets.map(evalPacket);
-            return a > b ? 1 : 0;
+            return subPacketVals[0] > subPacketVals[1] ? 1 : 0;
 
         case 6: // LT
-            const [c, dd] = packet.subPackets.map(evalPacket);
-            return c < dd ? 1 : 0;
+            return subPacketVals[0] < subPacketVals[1] ? 1 : 0;
 
         case 7: // EQ
-            const [e, f] = packet.subPackets.map(evalPacket);
-            return e === f ? 1 : 0;
+            return subPacketVals[0] === subPacketVals[1] ? 1 : 0;
 
         default:
             d('unknown packet type');
