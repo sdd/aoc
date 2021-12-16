@@ -1,6 +1,7 @@
 #![feature(format_args_capture)]
 #![feature(int_abs_diff)]
 
+use std::borrow::BorrowMut;
 use std::cell::{RefCell};
 use std::cmp::Ordering;
 use std::ops::{Deref, Neg};
@@ -44,7 +45,7 @@ pub struct Node {
 
     f: F,
     g: f64,
-    pub h: f64,
+    h: f64,
 }
 
 impl Ord for Node {
@@ -116,11 +117,11 @@ impl Grid {
             &self.nodes.get(end_idx).unwrap().borrow(),
         );
 
-
         self.nodes.get(start_idx).unwrap().borrow_mut().h = start_h;
 
         let mut open: PriorityQueue<usize, F> = PriorityQueue::new();
         open.push(start_idx, F(0f64));
+
         while let Some((current_idx, _)) = open.pop() {
             if current_idx == end_idx {
                 return self.path(current_idx).clone();
