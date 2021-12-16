@@ -8,50 +8,25 @@ use std::ops::{Deref, Neg};
 use std::time::Instant;
 use priority_queue::PriorityQueue;
 
-#[derive(Copy, Clone, PartialEq, Debug)]
-struct F(f64);
-
-impl Eq for F {}
-
-impl PartialOrd for F {
-    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        Some(self.0.partial_cmp(&other.0).unwrap())
-    }
-}
-
-impl Ord for F {
-    fn cmp(&self, other: &Self) -> Ordering {
-        self.0.partial_cmp(&other.0).unwrap()
-    }
-}
-
-impl Neg for F {
-    type Output = F;
-
-    fn neg(self) -> Self::Output {
-        F(0f64 - self.0)
-    }
-}
-
 #[derive(Debug)]
 pub struct Node {
     idx: usize,
     x: usize,
     y: usize,
-    weight: u32,
 
     visited: bool,
     closed: bool,
     parent: Option<usize>,
 
-    f: F,
-    g: f64,
-    h: f64,
+    weight: u32,
+    f: u32,
+    g: u32,
+    h: u32,
 }
 
 impl Ord for Node {
     fn cmp(&self, other: &Self) -> Ordering {
-        self.f.partial_cmp(&other.f).unwrap()
+        self.f.cmp(&other.f)
     }
 }
 
@@ -78,7 +53,7 @@ pub struct Grid {
 
 impl Node {
     pub fn new(idx: usize, x: usize, y: usize, weight: u32) -> Node {
-        Node { idx, x, y, weight, visited: false, closed: false, parent: None, f: F(0f64), g: 0f64, h: 0f64 }
+        Node { idx, x, y, weight, visited: false, closed: false, parent: None, f: 0, g: 0, h: 0 }
     }
 }
 
@@ -120,8 +95,8 @@ impl Grid {
 
         self.nodes.get(start_idx).unwrap().borrow_mut().h = start_h;
 
-        let mut open: PriorityQueue<usize, F> = PriorityQueue::new();
-        open.push(start_idx, F(0f64));
+        let mut open: PriorityQueue<usize, u32> = PriorityQueue::new();
+        open.push(start_idx, 0);
 
         while let Some((current_idx, _)) = open.pop() {
             if current_idx == end_idx {
@@ -131,8 +106,7 @@ impl Grid {
             let mut current = self.nodes.get(current_idx).unwrap().borrow_mut();
             current.closed = true;
 
-            let neighbours = self.get_neighbours(current.idx);
-            for neighbour_idx in neighbours {
+            for neighbour_idx in self.get_neighbours(current.idx) {
                 let mut neighbour = self.nodes.get(neighbour_idx).unwrap().borrow_mut();
 
                 if neighbour.closed {
@@ -141,22 +115,22 @@ impl Grid {
 
                 let already_visited = neighbour.visited;
 
-                if !already_visited || ((current.g + neighbour.weight as f64) < neighbour.g) {
+                if !already_visited || (current.g + neighbour.weight < neighbour.g) {
                     neighbour.visited = true;
                     neighbour.parent = Some(current.idx);
-                    if neighbour.h == 0f64 && neighbour_idx != end_idx {
+                    if neighbour.h == 0 && neighbour_idx != end_idx {
                         neighbour.h = manhattan(neighbour.deref(), &self.nodes.get(end_idx).unwrap().borrow());
                     }
-                    neighbour.g = current.g + neighbour.weight as f64;
-                    neighbour.f = F(neighbour.g + neighbour.h);
+                    neighbour.g = current.g + neighbour.weight;
+                    neighbour.f = neighbour.g + neighbour.h;
 
                 }
 
                 if !already_visited {
                     neighbour.parent = Some(current_idx);
-                    open.push(neighbour.idx, -neighbour.f);
+                    open.push(neighbour.idx, u32::MAX - neighbour.f);
                 } else {
-                    open.change_priority(&neighbour.idx, -neighbour.f);
+                    open.change_priority(&neighbour.idx, u32::MAX - neighbour.f);
                 }
             }
         }
@@ -165,8 +139,8 @@ impl Grid {
     }
 }
 
-pub fn manhattan(a: &Node, b: &Node) -> f64 {
-    (a.x.abs_diff(b.x) + a.y.abs_diff(b.y)) as f64
+pub fn manhattan(a: &Node, b: &Node) -> u32 {
+    (a.x.abs_diff(b.x) + a.y.abs_diff(b.y)) as u32
 }
 
 fn main() {
@@ -175,7 +149,7 @@ fn main() {
     // let raw = include_str!("example-01.txt");
 
     let raw_grid: Vec<Vec<u32>> = raw.lines().map(|line|
-        line.chars().filter_map(|char| char.to_digit(10)).collect()
+        line.chars().filter_map(|char| (char.to_digit(10).unwrap() as u32).into()).collect()
     ).collect();
     let width = raw_grid.len();
     let height = raw_grid[0].len();
@@ -184,7 +158,7 @@ fn main() {
     let nodes: Vec<RefCell<Node>> = raw.lines().enumerate().map(move |(y, row)|
         row.chars().enumerate().filter_map(move |(x, char)|
             char.to_digit(10).map(move |weight|
-                Node::new(x + y * width, x, y, weight)
+                Node::new(x + y * width, x, y, weight as u32)
             ))
     ).flatten()
     .map(|n| RefCell::new(n))
@@ -224,6 +198,7 @@ fn main() {
     let risk = calc_path_risk(full_width, full_height, &mut full_grid, path);
     println!("part2: {risk:?}");
     println!("elapsed: {}ms", start.elapsed().as_millis());
+    //println!("full_grid: {full_grid:?}");
 }
 
 pub fn calc_path_risk(width: usize, height: usize, grid: &mut Grid, path: Vec<usize>) -> u32 {
