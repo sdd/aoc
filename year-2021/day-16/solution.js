@@ -46,20 +46,17 @@ const HEX_MAP = {
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
 function parse({ raw, line, comma, space, multi }) {
-    const chars = line[0].slice().split('');
+    const chars = line[0].split('');
     return chars.map(x => HEX_MAP[x]).join('').split('');
 }
 
 function part1(binary) {
     binary = binary.slice();
-    const packets = [];
-    let packet;
-    while(binary.length) {
-        ([packet, binary] = parsePacket(binary));
-        packets.push(packet);
-    }
+    return sumVersion([parsePacket(binary)[0]]);
+}
 
-    return sumVersion(packets);
+function part2(input) {
+    return evalPacket(parsePacket(input)[0]);
 }
 
 function sumVersion(packets) {
@@ -118,10 +115,6 @@ function parsePacket(binary) {
             }
     }
     return [packet, binary];
-}
-
-function part2(input) {
-    return evalPacket(parsePacket(input)[0]);
 }
 
 function evalPacket(packet) {
