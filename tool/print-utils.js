@@ -52,30 +52,59 @@ function showInputStats(state) {
     const input = state.questionInput;
     console.log(chalk.blue(dashPad('Input Stats')));
 
-    const { raw, line, comma, space, multi } = state.questionInput;
+    const { raw, lines, alphanums, nums, chars, comma, space, multi, grid } = state.questionInput;
 
-    d('%d multiline blocks', multi.length);
     if (multi.length > 1) {
+        d('%o multi-line blocks', multi.length);
         d('First block: %o', multi[0]);
         d('Last block: %o', multi[multi.length - 1]);
+    } else {
+        //d('no multi-line blocks');
     }
     
-    d('%d lines.', line.length);
-    if (line.length > 1) {
-        d('First line: %o', line[0]);
-        d('Last line: %o', line[line.length - 1]);
-    }
-    
-    d('%d comma-seperated items.', comma.length);
-    if (comma.length > 1) {
-        d('First item: %o', comma[0]);
-        d('Last item: %o', comma[comma.length - 1]);
+    if (lines.length > 1) {
+        d('%o lines', lines.length);
+        d('First line: %o', lines[0]);
+        d('Last line: %o', lines[lines.length - 1]);
+    } else {
+        d('1 line, %o chars', chars.length);
+        if (chars.length <= 100) {
+            d('line: %o', lines[0]);
+        }
     }
 
-    d('%d space-seperated items.', space.length);
+    if (alphanums.length > 1) {
+        d('%o alphanums in first line (first %o, last %o)', alphanums.length, alphanums[0], alphanums[alphanums.length - 1]);
+    } else {
+        //d('no alphanums in first line');
+    }
+
+    if (nums.length > 1) {
+        d('%o nums in first line (first %o, last %o)', nums.length, nums[0], nums[nums.length - 1]);
+    } else {
+        //d('no nums in first line');
+    }
+
+    if (comma.length > 1) {
+        d('%o comma-separated items in first line (first %o, last %o)', comma.length, comma[0], comma[comma.length - 1]);
+    } else {
+        d('not comma-separated');
+    }
+
     if (space.length > 1) {
-        d('First item: %o', space[0]);
-        d('Last item: %o', space[space.length - 1]);
+        d('%o space-separated items (first %o, last %o)', space.length, space[0], space[space.length - 1]);
+    } else {
+        d('not space-separated');
+    }
+
+    if (grid.length > 1) {
+        if (_.every(grid, row => row.length === grid[0].length)) {
+            d('%d x %d grid', grid[0].length, grid.length);
+        } else {
+            //d('not a simple grid');
+        }
+    } else {
+        //d('not a simple grid');
     }
     
     console.log(chalk.blue(dashPad()));

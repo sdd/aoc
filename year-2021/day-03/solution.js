@@ -30,25 +30,30 @@ const ex2expectedP2 = ``;
 
 /**
  * Input parser.
- * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
+ * @param {Object} arg collection of pre-parsed helpers
+ * @param {string} arg.raw unmodified input string from input-01.txt
+ * @param {Array<string>} arg.lines raw split on newlines, trimmed, empty filtered
+ * @param {Array<string|Number>} arg.alphanums alphanumeric groups in lines[0]
+ * @param {Array<Number>} arg.nums numeric values in lines[0]
+ * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
+ * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
+ * @param {Array<string>} arg.chars split lines[0] on every char
+ * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
+ * @param {Array<Array<string>} arg.grid 2D char grid
  */
-function parse({ raw, line, comma, space, multi }) {
-    return line;
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
+    return lines;
 }
 
 function part1(input) {
     let gamma = 0;
     let eps = 0;
 
-    let count = input.length;
-    let len = input[0].length;
+    const count = input.length;
+    const len = input[0].length;
 
     for(let bit = 0; bit < len; bit++) {
-        let count1 = input.filter(x => x.charAt(bit) === '1').length;
+        const count1 = input.filter(x => x.charAt(bit) === '1').length;
         if (count1 > (count / 2)) {
             gamma += (2 ** (len - bit - 1));
         } else {
@@ -63,10 +68,10 @@ function part2(input) {
     let oxlist = [...input];
     let colist = [...input];
 
-    let len = input[0].length;
+    const len = input[0].length;
 
     for(let bit = 0; bit < len; bit++) {
-        let count1 = oxlist.filter(x => x.charAt(bit) === '1').length;
+        const count1 = oxlist.filter(x => x.charAt(bit) === '1').length;
         if (count1 >= (oxlist.length / 2)) {
             oxlist = oxlist.filter(x => x.charAt(bit) === '1');
         } else {
@@ -88,8 +93,8 @@ function part2(input) {
         if (colist.length === 1) { break; }
     }
 
-    let oxrat = parseInt(oxlist[0], 2);
-    let corat = parseInt(colist[0], 2);
+    const oxrat = parseInt(oxlist[0], 2);
+    const corat = parseInt(colist[0], 2);
 
     return oxrat * corat;
 }

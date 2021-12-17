@@ -7,6 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "geti": "DEBUG=* node ./aoc-2.js geti",
     "start": "DEBUG=aoc* node ./tool",
+    "all": "DEBUG=aoc* node ./tool/all",
     "lint": "eslint --fix",
     "prettier": "prettier --config ./.prettierrc.json --write './**/*.js'"
   },

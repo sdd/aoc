@@ -19,14 +19,19 @@ const ex2expectedP2 = ``;
 
 /**
  * Input parser.
- * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
+ * @param {Object} arg collection of pre-parsed helpers
+ * @param {string} arg.raw unmodified input string from input-01.txt
+ * @param {Array<string>} arg.lines raw split on newlines, trimmed, empty filtered
+ * @param {Array<string|Number>} arg.alphanums alphanumeric groups in lines[0]
+ * @param {Array<Number>} arg.nums numeric values in lines[0]
+ * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
+ * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
+ * @param {Array<string>} arg.chars split lines[0] on every char
+ * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
+ * @param {Array<Array<string>} arg.grid 2D char grid
  */
-function parse({ raw, line, comma, space, multi }) {
-    return comma.map(Number);
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
+    return nums;
 }
 
 function part1(input) {

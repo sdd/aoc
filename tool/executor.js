@@ -9,7 +9,7 @@ module.exports = {
     solveOnce
 };
 
-function solveOnce(state, examplesOnly = false) {
+function solveOnce(state, examplesOnly = false, allMode = false) {
     const solnPath = `../year-${state.year}/day-${String(state.day).padStart(2, '0')}/solution.js`;
     decache(solnPath);
 
@@ -17,19 +17,19 @@ function solveOnce(state, examplesOnly = false) {
     try {
         soln = require(solnPath);
     } catch(e) {
-        console.error(e);
+        !allMode && console.error(e);
     }
 
     try {
         const parsed = soln.parse(state.questionInput);
-        console.log(chalk.cyan(dashPad('parser')));
-        d('parsed item count: %d', parsed.length);
-        d('first parsed item: %o', parsed[0]);
-        d('last parsed item: %o', parsed[parsed.length - 1]);
-        console.log(chalk.cyan(dashPad()));
+        !allMode && console.log(chalk.cyan(dashPad('parser')));
+        !allMode && d('parsed item count: %d', parsed.length);
+        !allMode && d('first parsed item: %o', parsed[0]);
+        !allMode && d('last parsed item: %o', parsed[parsed.length - 1]);
+        !allMode && console.log(chalk.cyan(dashPad()));
 
-        if (soln.ex1 || soln.ex2) {
-            console.log(chalk.yellow(dashPad('Examples')));
+        if (!allMode && (soln.ex1 || soln.ex2)) {
+            !allMode && console.log(chalk.yellow(dashPad('Examples')));
             if (soln.ex1) {
                 d('ex1: %o', soln.ex1);
                 const input = preProcessInput(soln.ex1);
@@ -58,39 +58,39 @@ function solveOnce(state, examplesOnly = false) {
         }
 
         if (!examplesOnly) {
-            console.log(chalk.red(dashPad('SOLVER')));
-            d('executing part1...');
+            !allMode && console.log(chalk.red(dashPad('SOLVER')));
+            !allMode && d('executing part1...');
             const result1 = soln.part1(parsed);
 
             if (state.history?.rightAnswers?.part1) {
                 const correct = `${result1}` === state.history.rightAnswers.part1.answer;
-                d('part1 result: %o (expected: %o) %s', result1, state.history.rightAnswers.part1.answer, correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
+                !allMode && d('part1 result: %o (expected: %o) %s', result1, state.history.rightAnswers.part1.answer, correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
             } else {
                 const prevBadAnswers = state.history.wrongAnswers.part1.map(x => x.answer);
                 const knownWrong = prevBadAnswers.includes(`${result1}`)
                     ? chalk.red('Known to be WRONG :-(')
                     : '';
-                d('part1 result: %o %s', result1, knownWrong);
+                    !allMode && d('part1 result: %o %s', result1, knownWrong);
             }
             
-            d('executing part2...');
+            !allMode && d('executing part2...');
             const started = Date.now();
             const result2 = soln.part2(parsed);
-            d('duration: %ds', (Date.now() - started) / 1000);
+            !allMode && d('duration: %ds', (Date.now() - started) / 1000);
 
             if (state.history?.rightAnswers?.part2) {
                 const correct = `${result2}` === state.history.rightAnswers.part2.answer;
-                d('part2 result: %o (expected: %o) %s', result2, state.history.rightAnswers.part2.answer, correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
+                !allMode && d('part2 result: %o (expected: %o) %s', result2, state.history.rightAnswers.part2.answer, correct ? chalk.green.bold('CORRECT!'): chalk.red('WRONG :-('));
             } else {
                 const prevBadAnswers = state.history.wrongAnswers.part2.map(x => x.answer);
                 const knownWrong = prevBadAnswers.includes(`${result2}`)
                     ? chalk.red('Known to be WRONG :-(')
                     : '';
-                d('part2 result: %o %s', result2, knownWrong);
+                    !allMode && d('part2 result: %o %s', result2, knownWrong);
             }
             state.latestAnswers = [result1, result2];
 
-            console.log(chalk.red(dashPad()));
+            !allMode && console.log(chalk.red(dashPad()));
 
             return {
                 result1,

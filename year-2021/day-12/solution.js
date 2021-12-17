@@ -50,8 +50,21 @@ class Graph extends Map {
     }
 }
 
-function parse({ raw, line, comma, space, multi }) {
-    const edges = line.map(l => l.split('-'));
+/**
+ * Input parser.
+ * @param {Object} arg collection of pre-parsed helpers
+ * @param {string} arg.raw unmodified input string from input-01.txt
+ * @param {Array<string>} arg.lines raw split on newlines, trimmed, empty filtered
+ * @param {Array<string|Number>} arg.alphanums alphanumeric groups in lines[0]
+ * @param {Array<Number>} arg.nums numeric values in lines[0]
+ * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
+ * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
+ * @param {Array<string>} arg.chars split lines[0] on every char
+ * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
+ * @param {Array<Array<string>} arg.grid 2D char grid
+ */
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
+    const edges = lines.map(l => l.split('-'));
 
     const graph = new Graph();
     for (const [a, b] of edges) {
@@ -97,9 +110,9 @@ function partx(graph, canSecondVisitOne = false) {
 }
 
 function canSecondVisit(currPath, next) {
-    const lowerCaseVisited = currPath.filter(
-        x => (x === x.toLowerCase() && x !== 'end' && x !== 'start')
-    );
+    const lowerCaseVisited = currPath.filter(x => (
+        x === x.toLowerCase() && x !== 'end' && x !== 'start'
+    ));
 
     const visited = new Set();
     let haveDoubleVisited = false;

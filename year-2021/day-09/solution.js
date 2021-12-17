@@ -24,14 +24,19 @@ const ex2expectedP2 = ``;
 
 /**
  * Input parser.
- * @param {raw} raw unmodified input string from input-01.txt
- * @param {line} raw split on newlines, empty items removed, items trimmed
- * @param {comma} raw split on commas, empty items removed, items trimmed
- * @param {space} raw split on spaces, empty lines removed, items trimmed
- * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
+ * @param {Object} arg collection of pre-parsed helpers
+ * @param {string} arg.raw unmodified input string from input-01.txt
+ * @param {Array<string>} arg.lines raw split on newlines, trimmed, empty filtered
+ * @param {Array<string|Number>} arg.alphanums alphanumeric groups in lines[0]
+ * @param {Array<Number>} arg.nums numeric values in lines[0]
+ * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
+ * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
+ * @param {Array<string>} arg.chars split lines[0] on every char
+ * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
+ * @param {Array<Array<string>} arg.grid 2D char grid
  */
-function parse({ raw, line, comma, space, multi }) {
-    return line.map(l => l.split('').map(Number));
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
+    return grid;
 }
 
 function part1(input) {
@@ -55,15 +60,17 @@ function part1(input) {
 
 function part2(input) {
     const lowPoints = new Set();
+    const yl = input.length;
+    const xl = input[0].length;
 
-    for(let y = 0; y < input.length; y++) {
-        for(let x = 0; x < input[0].length; x++) {
+    for(let y = 0; y < yl; y++) {
+        for(let x = 0; x < xl; x++) {
             const curr = input[y][x];
             if (
                 (y === 0 || input[y-1][x] > curr)
                 && (x === 0 || input[y][x-1] > curr)
-                && (y === input.length - 1 || input[y+1][x] > curr)
-                && (x === input[0].length - 1 || input[y][x+1] > curr)
+                && (y === yl - 1 || input[y+1][x] > curr)
+                && (x === xl - 1 || input[y][x+1] > curr)
                     
             ) {
                 lowPoints.add(`${x}_${y}`);
@@ -89,9 +96,9 @@ function part2(input) {
                 if (input[y][x] < 9) {
                     basinTot++;
                     if (y > 0) { addIfUnseen(x, y-1); }
-                    if (y < input.length - 1) { addIfUnseen(x, y + 1); }
+                    if (y < yl - 1) { addIfUnseen(x, y + 1); }
                     if (x > 0) { addIfUnseen(x - 1, y); }
-                    if (x < input[0].length - 1) { addIfUnseen(x + 1, y); }
+                    if (x < xl - 1) { addIfUnseen(x + 1, y); }
                 }
             }
         }

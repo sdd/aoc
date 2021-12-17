@@ -3,7 +3,7 @@ const _ = require('lodash');
 const GOT_RETRY = 1;
 const TZ_OFFSET = 5;
 
-const TEMPLATE_FILES = [ 'solution.js', 'solution.test.js'];
+const TEMPLATE_FILES = [ 'solution.js'/* , 'solution.test.js' */];
 const ORIGIN = 'https://adventofcode.com';
 
 const [ CURRENT_YEAR, CURRENT_MONTH, CURRENT_DAY ] = (new Date).toISOString().split('T')[0].split('-').map(Number);

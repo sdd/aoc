@@ -3,7 +3,7 @@ module.exports = {
     splitNonAlphanum,
 };
 
-const REGEX_MATCH_ALPHANUM = /([\da-zA-Z]+)/g;
+const REGEX_MATCH_ALPHANUM = /(-?\d+|[a-zA-Z]+)/g;
 
 function splitNonAlphanum(str) {
     return [ ...str.matchAll(REGEX_MATCH_ALPHANUM) ]
