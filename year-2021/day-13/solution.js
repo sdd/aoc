@@ -82,8 +82,8 @@ function part1({ paper, folds }) {
 function part2({ paper, folds }) {
     paper = folds.reduce(doFold, paper);
 
-    util.paint2D(paper);
-    return false;
+    // util.paint2D(paper);
+    return JSON.stringify(paper);
 }
 
 function doFold(paper, { axis, val }) {

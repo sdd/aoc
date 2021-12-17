@@ -3,6 +3,7 @@ const d = require('debug')('aocx:all');
 const _ = require('lodash');
 const ora = require('ora');
 const PkgDir = require('pkg-dir');
+const chalk = require('chalk');
 
 const fileAccess = require('./file-access');
 const { preProcessInput } = require('./parsing');
@@ -44,7 +45,7 @@ for (let year = 2020; year <= CURRENT_YEAR - (CURRENT_MONTH === 12 ? 0 : 1); yea
             const part1IsCorrect = state.history?.rightAnswers?.part1.answer === `${results.result1}`;
             const part2IsCorrect = state.history?.rightAnswers?.part2.answer === `${results.result2}`;
 
-            console.log(`Day ${String(state.day).padStart(2, '0')}: ${part1IsCorrect ? '⭐' : 'X' }${part2IsCorrect ? '⭐' : 'X' }`)
+            console.log(`Day ${String(state.day).padStart(2, '0')}: ${part1IsCorrect ? chalk.yellow.bold('⭐') : chalk.red.bold('X') }${part2IsCorrect ? chalk.yellow.bold('⭐') : chalk.red.bold('X') }`)
 
         } else {
             // print a blank for theday
