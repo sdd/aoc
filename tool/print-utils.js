@@ -19,9 +19,8 @@ function dashPad(str, len = process.stdout.columns) {
 
 function showSolvePrompt(state) {
     const options = [
-      { key: 'q', msg: 'quit', color: 'magenta' },
       { key: 'r', msg: 're-run', color: 'green' },
-      { key: 'e', msg: 're-run (examples only)', color: 'green' },
+      { key: 'e', msg: 're-run examples only', color: 'green' },
     ];
 
     if (!state.history?.rightAnswers?.part1 && isSubmittable(state.latestAnswers[0])) {
@@ -36,6 +35,9 @@ function showSolvePrompt(state) {
             options.push({ key: '2', msg: 'submit part 2', color: 'bgRed' });
         }
     }
+
+    options.push({ key: 'q', msg: 'quit', color: 'red' });
+    options.push({ key: 'd', msg: 'change day', color: 'magenta' });
 
     const optionStrings = options.map(({ color, key, msg }) =>
         chalk[color](`${key} to ${msg}`)

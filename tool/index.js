@@ -31,6 +31,23 @@ const chalk = require('chalk');
 
     const spinner = ora('starting...').start();
 
+    await setupDay(state, spinner);
+
+    keyHandler.initialise({
+        'q': () => util.gracefulExit(state),
+        '\u0003': () => util.gracefulExit(state),
+        'r': () => { solveOnce(state); showSolvePrompt(state); },
+        'e': () => { solveOnce(state, true); showSolvePrompt(state); },
+        '1': () => tryAnswer(state, spinner, 1),
+        '2': () => tryAnswer(state, spinner, 2),
+        'd': async () => {
+            Object.assign(state, await startPrompt());
+            await setupDay(state, spinner);
+        },
+    });
+})();
+
+async function setupDay(state, spinner) {
     await fileAccess.ensureYearFolderExists(state, spinner);
     await fileAccess.ensureDayFolderExists(state, spinner);
     await fileAccess.ensureSolutionFilesExist(state, spinner);
@@ -39,14 +56,18 @@ const chalk = require('chalk');
     if (LIVE_WAIT_MODE) {
         await spinUntilProblemOpen(state, spinner);
     }
-    
+
     state.questionInput = preProcessInput(await fileAccess.ensureInputFilesExist(state, spinner));
     state.history =  await fileAccess.ensureHistoryFileExists(state, spinner);
 
-    showInputStats(state);
-    const results = solveOnce(state);
+    showInputStats(state); 
+    solveOnce(state);
+    await autoSubmit(state, spinner);
     showSolvePrompt(state);
 
+    if (state.watcher) {
+        await state.watcher.close();
+    }
     state.watcher = util.createWatcher(state, async event => {
         console.log(`${event} changed, rerunning...`);
         process.stdin.resume();
@@ -56,15 +77,9 @@ const chalk = require('chalk');
         showSolvePrompt(state);
     });
 
-    keyHandler.initialise({
-        'q': () => util.gracefulExit(state),
-        '\u0003': () => util.gracefulExit(state),
-        'r': () => { solveOnce(state); showSolvePrompt(state); },
-        'e': () => { solveOnce(state, true); showSolvePrompt(state); },
-        '1': () => tryAnswer(state, spinner, 1),
-        '2': () => tryAnswer(state, spinner, 2),
-    });
-})();
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
+}
 
 async function autoSubmit(state, spinner) {
     if (!state.history?.rightAnswers?.part1) {
