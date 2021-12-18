@@ -49,17 +49,18 @@ const ex2expectedP2 = ``;
 }
 
 function part1(input) {
-    const reduced = input.reduce((acc, seq) => sfReduce([acc, seq]));
+    const reduced = input.reduce((acc, seq) => reduceSnailFish([acc, seq]));
     return magnitude(reduced);
 }
 
 function part2(input) {
     let maxMag = Number.MIN_SAFE_INTEGER;
+
     for(const a of _.range(0, input.length)) {
         for(const b of _.range(0, input.length)) {
             if (a === b) { continue; }
 
-            const sumab = sfReduce([ input[a], input[b] ]);
+            const sumab = reduceSnailFish([ input[a], input[b] ]);
             maxMag = Math.max(maxMag, magnitude(sumab));
         }
     }
@@ -73,58 +74,64 @@ function magnitude(item) {
         : item;
 }
 
-function sfReduce(seq) {
+function reduceSnailFish(initial) {
     let count = 1;
-    let orig = seq;
-    let result;
+    let before = initial;
+    let after;
 
     while (++count < 600) { // arbitrary limit to prevent infinite loop in case of a bug
-        result = explode(orig);
+        after = explode(before);
 
-        if (JSON.stringify(result) === JSON.stringify(orig)) {
+        if (after === before) {
             // no explosion, check for split
-            result = split(orig);
+            after = split(before);
         }
 
-        if (result === orig) {
+        if (after === before) {
             // no explosion or split. reduce complete.
-            return result;
-        } else {
-            orig = result;
+            return after;
         }
+
+        before = after;
     }
     d('LOOP LIMIT REACHED');
-    return result;
+    return after;
 }
 
-function explode(seq) {
-    return explodeInner(seq, 0)[1];
+function explode(item) {
+    // set depth to 0, ignore top-level explosion carryover
+    return explodeInner(item, 0)[1];
 }
 
-function explodeInner(seq, depth) {
-    if (!Array.isArray(seq)) {
-        return [null, seq, null];
+// returns an array of three items:
+// * left overflow from explosion, or null
+// * new item
+// * right overflow from explosion, or null
+function explodeInner(item, depth) {
+    if (!Array.isArray(item)) {
+        return [null, item, null]; // scalar case
     }
-    
-    const [left, right] = seq;
+    const [left, right] = item;
+
     if (depth === 3) {
         if (Array.isArray(left)) {
-            // need to explode left item
+            // need to explode left child
+
             if (!Array.isArray(right)) {
                 // simple case, just add to scalar
                 return [left[0], [0, right + left[1]], null];
             } else {
-                // explode left into overflow left and right item
+                // explode left child into overflow left and right child
                 return [left[0], [0, addFromLeft(right, left[1])], null];
             }
             
         } else if (Array.isArray(right)) {
-            // explode right into left and overflow right
+            // explode right child into left child and overflow right
             return [null, [left + right[0], 0], right[1]];
 
         } else {
-            // two scalars, no explosion required
-            return [null, seq, null];
+            // two scalars at level 4, no explosion required
+            return [null, item, null];
         }
     }
 
@@ -135,19 +142,23 @@ function explodeInner(seq, depth) {
     let rightPassedRight = null;
 
     // only one explosion per action. only try right reduce if left didn't explode
-    if (leftPassedLeft === null && leftPassedRight === null && JSON.stringify(left) === JSON.stringify(newLeft)) {
+    if (left === newLeft) {
         // checking for RHS explosion
         ([rightPassedLeft, newRight, rightPassedRight] = explodeInner(right, depth + 1));
     }
 
     if (leftPassedRight === null) {
         if (rightPassedLeft === null) {
-            // nothing doing
-            return [leftPassedLeft, [newLeft, newRight], rightPassedRight];
+            if (left !== newLeft || right !== newRight) {
+                // inner explosion
+                return [leftPassedLeft, [newLeft, newRight], rightPassedRight];
+            }
         } else {
             // val passed from right to left
             if (!Array.isArray(newLeft)) {
-                return [leftPassedLeft, [newLeft + rightPassedLeft, newRight], rightPassedRight];
+                if (newRight !== right || rightPassedLeft > 0) {
+                    return [leftPassedLeft, [newLeft + rightPassedLeft, newRight], rightPassedRight];
+                }
             } else {
                 return [leftPassedLeft, [addFromRight(newLeft, rightPassedLeft), newRight], rightPassedRight];
             }
@@ -155,29 +166,24 @@ function explodeInner(seq, depth) {
     } else {
         // val passed from left to right
         if (!Array.isArray(newRight)) {
-            return [leftPassedLeft, [newLeft, newRight + leftPassedRight], rightPassedRight];
+            if (newLeft !== left || leftPassedRight > 0) {
+                return [leftPassedLeft, [newLeft, newRight + leftPassedRight], rightPassedRight];
+            }
         } else {
             return [leftPassedLeft, [newLeft, addFromLeft(newRight, leftPassedRight)], rightPassedRight];
         }
     }
+
+    // nothing doing
+    return [leftPassedLeft, item, rightPassedRight];
 }
 
-function addFromLeft(pair, val) {
-    const [left, right] = pair;
-    if (!Array.isArray(left)) {
-        return [left + val, right];
-    } else {
-        return [addFromLeft(left, val), right];
-    }
+function addFromLeft([left, right], val) {
+    return Array.isArray(left) ? [addFromLeft(left, val), right] : [left + val, right];
 }
 
-function addFromRight(pair, val) {
-    const [left, right] = pair;
-    if (!Array.isArray(right)) {
-        return [left, right + val];
-    } else {
-        return [left, addFromRight(right, val)];
-    }
+function addFromRight([left, right], val) {
+    return Array.isArray(right) ? [left, addFromRight(right, val)] : [left, right + val];
 }
 
 function split(item) {
@@ -186,14 +192,12 @@ function split(item) {
         if (item > 9) {
             // need to split it
             return [Math.floor(item / 2), Math.ceil(item / 2)];
-        } else {
-            // nothing doing
-            return item;
         }
     } else {
         // item is a pair
         const [left, right] = item;
         const splitLeft = split(left);
+
         if (splitLeft !== left) {
             // there was a split in the left item
             return [splitLeft, right];
@@ -202,12 +206,11 @@ function split(item) {
             if (splitRight !== right) {
                 // there was a split in the right item
                 return [left, splitRight];
-            } else {
-                // nothing doing
-                return item;
-            }
+            } 
         }
     }
+
+    return item;
 }
 
 module.exports = {
