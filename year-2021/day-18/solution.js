@@ -53,7 +53,10 @@ function part1(input) {
     return magnitude(reduced);
 }
 
+let totalActions;
+
 function part2(input) {
+    totalActions = 0;
     let maxMag = Number.MIN_SAFE_INTEGER;
 
     for(const a of _.range(0, input.length)) {
@@ -65,6 +68,7 @@ function part2(input) {
         }
     }
 
+    d('Total actions: %o', totalActions);
     return maxMag;
 }
 
@@ -80,18 +84,15 @@ function reduceSnailFish(initial) {
     let after;
 
     while (++count < 600) { // arbitrary limit to prevent infinite loop in case of a bug
-        after = explode(before);
-
-        if (after === before) {
+        if (before === (after = explode(before))) {
             // no explosion, check for split
-            after = split(before);
+            if (before === (after = split(before))) {
+                // no explosion or split. reduce complete.
+                return after;
+            }
         }
-
-        if (after === before) {
-            // no explosion or split. reduce complete.
-            return after;
-        }
-
+       
+        totalActions++;
         before = after;
     }
     d('LOOP LIMIT REACHED');
@@ -105,7 +106,7 @@ function explode(item) {
 
 // returns an array of three items:
 // * left overflow from explosion, or null
-// * new item
+// * new item (or original if no explosion)
 // * right overflow from explosion, or null
 function explodeInner(item, depth) {
     if (!Array.isArray(item)) {
@@ -141,9 +142,8 @@ function explodeInner(item, depth) {
     let newRight = right;
     let rightPassedRight = null;
 
-    // only one explosion per action. only try right reduce if left didn't explode
+    // only one explosion per action. only try right explode if left didn't explode
     if (left === newLeft) {
-        // checking for RHS explosion
         ([rightPassedLeft, newRight, rightPassedRight] = explodeInner(right, depth + 1));
     }
 
@@ -157,25 +157,25 @@ function explodeInner(item, depth) {
             // val passed from right to left
             if (!Array.isArray(newLeft)) {
                 if (newRight !== right || rightPassedLeft > 0) {
-                    return [leftPassedLeft, [newLeft + rightPassedLeft, newRight], rightPassedRight];
+                    return [null, [newLeft + rightPassedLeft, newRight], rightPassedRight];
                 }
             } else {
-                return [leftPassedLeft, [addFromRight(newLeft, rightPassedLeft), newRight], rightPassedRight];
+                return [null, [addFromRight(newLeft, rightPassedLeft), newRight], rightPassedRight];
             }
         }
     } else {
         // val passed from left to right
         if (!Array.isArray(newRight)) {
             if (newLeft !== left || leftPassedRight > 0) {
-                return [leftPassedLeft, [newLeft, newRight + leftPassedRight], rightPassedRight];
+                return [leftPassedLeft, [newLeft, newRight + leftPassedRight], null];
             }
         } else {
-            return [leftPassedLeft, [newLeft, addFromLeft(newRight, leftPassedRight)], rightPassedRight];
+            return [leftPassedLeft, [newLeft, addFromLeft(newRight, leftPassedRight)], null];
         }
     }
 
-    // nothing doing
-    return [leftPassedLeft, item, rightPassedRight];
+    // nothing exploded
+    return [null, item, null];
 }
 
 function addFromLeft([left, right], val) {
@@ -186,6 +186,7 @@ function addFromRight([left, right], val) {
     return Array.isArray(right) ? [left, addFromRight(right, val)] : [left, right + val];
 }
 
+// returns unchanged item with same reference if no split occurred
 function split(item) {
     if (!Array.isArray(item)) {
         // item is scalar
