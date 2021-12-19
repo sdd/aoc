@@ -61,7 +61,7 @@ async function setupDay(state, spinner) {
     state.history =  await fileAccess.ensureHistoryFileExists(state, spinner);
 
     showInputStats(state); 
-    solveOnce(state);
+    solveOnce(state, !!process.env.EXAMPLES_ONLY);
     await autoSubmit(state, spinner);
     showSolvePrompt(state);
 
@@ -72,7 +72,7 @@ async function setupDay(state, spinner) {
         console.log(`${event} changed, rerunning...`);
         process.stdin.resume();
         showInputStats(state); 
-        solveOnce(state);
+        solveOnce(state, !!process.env.EXAMPLES_ONLY);
         await autoSubmit(state, spinner);
         showSolvePrompt(state);
     });

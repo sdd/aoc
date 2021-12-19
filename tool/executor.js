@@ -99,10 +99,12 @@ function solveOnce(state, examplesOnly = false, allMode = false) {
         } else {
             console.log("EXAMPLES ONLY MODE: NOT RUNNING AGAINST MAIN QUESTION INPUT")
             console.log(chalk.red(dashPad()));
-
+            
+            state.latestAnswers = [false, false];
+            
             return {
-                result1: state.latestAnswers[0],
-                result2: state.latestAnswers[1],
+                result1: state?.latestAnswers[0],
+                result2: state?.latestAnswers[1],
             };
         }
 
