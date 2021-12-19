@@ -1,1 +1,19 @@
-{"submissionBlockedUntil":false,"sessions":[],"wrongAnswers":{"part1":[],"part2":[]},"rightAnswers":{"part1":{"answer":"319233","succeeded":"2021-12-10T05:07:25.343Z"},"part2":{"answer":"1118976874","succeeded":"2021-12-10T05:21:09.485Z"}},"created":"2021-12-10T05:00:01.179Z"}
+{
+    "submissionBlockedUntil": false,
+    "sessions": [],
+    "wrongAnswers": {
+        "part1": [],
+        "part2": []
+    },
+    "rightAnswers": {
+        "part1": {
+            "answer": "319233",
+            "succeeded": "2021-12-10T05:07:25.343Z"
+        },
+        "part2": {
+            "answer": "1118976874",
+            "succeeded": "2021-12-10T05:21:09.485Z"
+        }
+    },
+    "created": "2021-12-10T05:00:01.179Z"
+}
