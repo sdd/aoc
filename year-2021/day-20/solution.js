@@ -58,120 +58,41 @@ const POSITIONS = [
 ]
 
 function part1(input) {
-    // d('input: %O', input);
-    let map = _.cloneDeep(input.map);
-    // console.log('initial');
-    // util.paint2D(map);
-
-    // d('map: %O', map);
-
-    const oldH = map.length;
-    const oldW = map[0].length;
-
-    const newMap = util.array2D(oldW + 20, oldH + 20, (y, x) => {
-        if (y - 10 < 0 || x - 10 < 0 || y - 10 >= oldH || x - 10 >= oldW) {
-            return '.';
-        }
-        // console.log({x, y, oldx: x - 3, oldy: y - 3});
-        return map[y - 10][x - 10];
-    });
-    map = newMap;
-
-    // console.log('initial expanded');
-    // util.paint2D(map);
-
-    for(let step = 1; step <= 2; step++) {
-        const oldH = map.length;
-        const oldW = map[0].length;
-
-        let newMap = util.array2D(oldW + 2, oldH + 2, (y, x) => {
-            if (y - 1 < 0 || x - 1 < 0 || y - 1 >= oldH || x - 1 >= oldW) {
-                return '.';
-            }
-            return map[y - 1][x - 1];
-        })
-
-        // util.paint2D(newMap);
-        // console.log('');
-        // map = newMap;
-
-        newMap = _.cloneDeep(map);
-        for(let y = 1; y < newMap.length - 1; y++) {
-            for(let x = 1; x < newMap[0].length - 1; x++) {
-                let bitString = '';
-                for(const pos of POSITIONS) {
-                    bitString += map[y + pos[1]][x + pos[0]] === '#' ? '1' : '0';
-                }
-                const index = parseInt(bitString, 2);
-                const result = input.enhancement[index];
-                // d('x=%d,y=%d: bitString = %s, index=%d, result=%s', x, y, bitString, index, result);
-
-
-                newMap[y][x] = result;
-            }
-        }
-
-        console.log(`after step ${  step}`);
-        util.paint2D(newMap);
-        console.log('');
-        map = newMap;
-
-    }
-
-    map[5][5] = 'S';
-    map[map.length - 5][map[0].length - 5] = 'E';
-    util.paint2D(map);
-
-    let count = 0;
-    for(let y = 5; y < map.length - 5; y++) {
-        for(let x = 5; x < map[0].length- 5; x++) {
-            if (map[y][x] === '#') {
-                count++;
-            }
-        }
-    }
-
-    return count;
+    return partx(input, 2);
 }
 
 function part2(input) {
-    // d('input: %O', input);
+    return partx(input, 50);
+}
+
+function partx(input, steps) {
     let map = _.cloneDeep(input.map);
-    // console.log('initial');
-    // util.paint2D(map);
 
-    // d('map: %O', map);
+    const h = map.length;
+    const w = map[0].length;
 
-    const oldH = map.length;
-    const oldW = map[0].length;
-
-    const newMap = util.array2D(oldW + 20, oldH + 20, (y, x) => {
-        if (y - 10 < 0 || x - 10 < 0 || y - 10 >= oldH || x - 10 >= oldW) {
+    const b = 2;
+    // add a buffer to the outside
+    let newMap = util.array2D(w + b*2, h + b*2, (y, x) => {
+        if (y - b < 0 || x - b < 0 || y - b >= h || x - b >= w) {
             return '.';
         }
-        // console.log({x, y, oldx: x - 3, oldy: y - 3});
-        return map[y - 10][x - 10];
+        return map[y - b][x - b];
     });
     map = newMap;
 
-    // console.log('initial expanded');
-    // util.paint2D(map);
+    for(let step = 1; step <= steps; step++) {
 
-    for(let step = 1; step <= 50; step++) {
-        const oldH = map.length;
-        const oldW = map[0].length;
-
-        let newMap = util.array2D(oldW + 2, oldH + 2, (y, x) => {
-            if (y - 1 < 0 || x - 1 < 0 || y - 1 >= oldH || x - 1 >= oldW) {
+        // expand the map
+        newMap = util.array2D(map[0].length + 2, map.length + 2, (y, x) => {
+            if (y - 1 < 0 || x - 1 < 0 || y - 1 >= map.length || x - 1 >= map[0].length) {
                 return '.';
             }
             return map[y - 1][x - 1];
         })
-
-        // util.paint2D(newMap);
-        // console.log('');
         map = newMap;
 
+        // "enhance" the image
         newMap = _.cloneDeep(map);
         for(let y = 1; y < newMap.length - 1; y++) {
             for(let x = 1; x < newMap[0].length - 1; x++) {
@@ -181,51 +102,35 @@ function part2(input) {
                 }
                 const index = parseInt(bitString, 2);
                 const result = input.enhancement[index];
-                // d('x=%d,y=%d: bitString = %s, index=%d, result=%s', x, y, bitString, index, result);
-
-
                 newMap[y][x] = result;
             }
         }
-
-        // console.log(`after step ${  step}`);
-        // util.paint2D(newMap);
-        // console.log('');
-        
         map = newMap;
-        if (step % 2 === 1) {
-            for(let x = 0; x < map[0].length; x++) {
-                map[0][x] = '#';
-                map[map.length - 1][x] = '#';
-            };
 
-            for(let y = 0; y < map.length; y++) {
-                map[y][0] = '#';
-                map[y][map[0].length - 1] = '#';
-            };
-        }
-        if (step % 2 === 0) {
-            for(let x = 1; x < map[0].length - 1; x++) {
-                map[1][x] = '.';
-                map[map.length - 2][x] = '.';
-            };
+        // clean up the border
+        const borderPixel = map[2][2];
+        for(let x = 0; x < map[0].length; x++) {
+            map[0][x] = borderPixel;
+            map[1][x] = borderPixel;
+            map[map.length - 1][x] = borderPixel;
+            map[map.length - 2][x] = borderPixel;
+        };
 
-            for(let y = 1; y < map.length - 1; y++) {
-                map[y][1] = '.';
-                map[y][map[0].length - 2] = '.';
-            };
-        }
-        paint2DCorner(map, 20);
+        for(let y = 0; y < map.length; y++) {
+            map[y][0] = borderPixel;
+            map[y][1] = borderPixel;
+            map[y][map[0].length - 1] = borderPixel;
+            map[y][map[0].length - 2] = borderPixel;
+        };
 
+        // console.log(`step ${  step}`);
+        // util.paint2DCorner(map, 20);
+        // console.log(' ');
     }
 
-    // map[8][8] = 'S';
-    // map[map.length - 8][map[0].length - 8] = 'E';
-    paint2DCorner(map, 20);
-
     let count = 0;
-    for(let y = 5; y < map.length - 5; y++) {
-        for(let x = 5; x < map[0].length- 5; x++) {
+    for(let y = 0; y < map.length; y++) {
+        for(let x = 0; x < map[0].length; x++) {
             if (map[y][x] === '#') {
                 count++;
             }
@@ -246,33 +151,3 @@ module.exports = {
     part2,
     parse,
 };
-
-function paint2DCorner(arr, size) {
-    for (let r = 0; r < size; r++) {
-        let out = '';
-        for(let c = 0; c < size; c++) {
-            switch (arr[r][c]) {
-                case 0:
-                    out += ' ';
-                    break;
-                case 'O':
-                    out += chalk.bgGreen(chalk.red('O'));
-                    break;
-                case '#':
-                case 1:
-                    out += '█';
-                    break;
-                case -1:
-                    out += '.';
-                    break;
-                case '.':
-                default:
-                    out += arr[r][c];
-                    break;
-            }
-            // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
-        }
-        // eslint-disable-next-line no-console
-        console.log(out);
-    }
-}

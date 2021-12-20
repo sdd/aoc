@@ -30,9 +30,12 @@
   "rightAnswers": {
     "part1": {
       "answer": "5391",
-      "succeeded": "2021-12-20T06:09:08.479Z"
+      "succeeded": "2021-12-20T06:11:51.000Z"
     },
-    "part2": false
+    "part2": {
+      "answer": "16383",
+      "succeeded": "2021-12-20T06:34:00.000Z"
+    }
   },
   "created": "2021-12-20T05:00:00.941Z"
 }

@@ -103,6 +103,36 @@ function paint2D(arr) {
     }
 }
 
+function paint2DCorner(arr, size) {
+    for (let r = 0; r < size && r < arr.length; r++) {
+        let out = '';
+        for(let c = 0; c < size && c < arr[r].length; c++) {
+            switch (arr[r][c]) {
+                case 0:
+                    out += ' ';
+                    break;
+                case 'O':
+                    out += chalk.bgGreen(chalk.red('O'));
+                    break;
+                case '#':
+                case 1:
+                    out += '█';
+                    break;
+                case -1:
+                    out += '.';
+                    break;
+                case '.':
+                default:
+                    out += arr[r][c];
+                    break;
+            }
+            // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
+        }
+        // eslint-disable-next-line no-console
+        console.log(out);
+    }
+}
+
 // eslint-disable-next-line no-unused-vars
 function for2D(arr, fn, {
     xCond = x => x < arr.length,
@@ -255,6 +285,7 @@ module.exports = {
     minIndexBy,
     maxIndexBy,
     paint2D,
+    paint2DCorner,
     posints,
     posInts: posints,
 
