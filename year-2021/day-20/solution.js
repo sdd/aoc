@@ -45,18 +45,6 @@ const ex2expectedP2 = ``;
     return { enhancement, map };
 }
 
-const POSITIONS = [
-    [-1, -1],
-    [0, -1],
-    [1, -1],
-    [-1, 0],
-    [0, 0],
-    [1, 0],
-    [-1, 1],
-    [0, 1],
-    [1, 1],
-]
-
 function part1(input) {
     return partx(input, 2);
 }
@@ -68,76 +56,39 @@ function part2(input) {
 function partx(input, steps) {
     let map = _.cloneDeep(input.map);
 
-    const h = map.length;
-    const w = map[0].length;
-
-    const b = 2;
     // add a buffer to the outside
-    let newMap = util.array2D(w + b*2, h + b*2, (y, x) => {
-        if (y - b < 0 || x - b < 0 || y - b >= h || x - b >= w) {
-            return '.';
-        }
-        return map[y - b][x - b];
-    });
-    map = newMap;
+    map = util.expand2D(map, 2, '.');
+
+    function kernel(window) {
+        const bitString = _.flatten(window)
+            .map(c => (c === '#' ? '1' : '0'))
+            .join('');
+        return input.enhancement[parseInt(bitString, 2)];
+    }
 
     for(let step = 1; step <= steps; step++) {
 
-        // expand the map
-        newMap = util.array2D(map[0].length + 2, map.length + 2, (y, x) => {
-            if (y - 1 < 0 || x - 1 < 0 || y - 1 >= map.length || x - 1 >= map[0].length) {
-                return '.';
-            }
-            return map[y - 1][x - 1];
-        })
-        map = newMap;
+        // grow the map by 1
+        map = util.expand2D(map, 1, '.');
 
         // "enhance" the image
-        newMap = _.cloneDeep(map);
-        for(let y = 1; y < newMap.length - 1; y++) {
-            for(let x = 1; x < newMap[0].length - 1; x++) {
-                let bitString = '';
-                for(const pos of POSITIONS) {
-                    bitString += map[y + pos[1]][x + pos[0]] === '#' ? '1' : '0';
-                }
-                const index = parseInt(bitString, 2);
-                const result = input.enhancement[index];
-                newMap[y][x] = result;
-            }
-        }
-        map = newMap;
+        map = util.convolve(map, 3, kernel);
 
         // clean up the border
         const borderPixel = map[2][2];
-        for(let x = 0; x < map[0].length; x++) {
-            map[0][x] = borderPixel;
-            map[1][x] = borderPixel;
-            map[map.length - 1][x] = borderPixel;
-            map[map.length - 2][x] = borderPixel;
-        };
+        map = util.convolve(map, 1, (w, x, y) => {
+            if (x < 2 || y < 2 || x >= map[y].length - 2 || y >= map.length - 2) {
+                return borderPixel;
+            }
+            return w[0][0];
+        });
 
-        for(let y = 0; y < map.length; y++) {
-            map[y][0] = borderPixel;
-            map[y][1] = borderPixel;
-            map[y][map[0].length - 1] = borderPixel;
-            map[y][map[0].length - 2] = borderPixel;
-        };
-
-        // console.log(`step ${  step}`);
-        // util.paint2DCorner(map, 20);
+        // console.log(`step ${step}`);
+        // util.paint2D(map, { max: 20 });
         // console.log(' ');
     }
 
-    let count = 0;
-    for(let y = 0; y < map.length; y++) {
-        for(let x = 0; x < map[0].length; x++) {
-            if (map[y][x] === '#') {
-                count++;
-            }
-        }
-    }
-
-    return count;
+    return util.arrayCount(map, x => x === '#');
 }
 
 module.exports = {

@@ -73,67 +73,34 @@ function minIndexBy(arr, fn = x => x) {
     return _.sortBy(_.toPairs(arr), ([k, v]) => fn(v))[0][0];
 }
 
-function paint2D(arr) {
-    for (let r = 0; r < arr.length; r++) {
+const DEFAULT_CHAR_MAP = {
+    '0': ' ',  // "empty"
+    'O': chalk.bgGreen(chalk.red('O')), // Y2020D19 Seamonster
+    '1': '█',  // "wall"
+    '#': '█',  // "wall"
+    '-1': '.',
+}
+
+function paint2D(arr, {
+    max,
+    maxHeight = max || (arr.length - 1),
+    maxWidth = max || (arr[0].length - 1),
+    charMap = DEFAULT_CHAR_MAP,
+} = {}) {
+    for (let r = 0; r <= maxHeight  && r < arr.length; r++) {
         let out = '';
-        for(let c = 0; c < arr[0].length; c++) {
-            switch (arr[r][c]) {
-                case 0:
-                    out += ' ';
-                    break;
-                case 'O':
-                    out += chalk.bgGreen(chalk.red('O'));
-                    break;
-                case '#':
-                case 1:
-                    out += '█';
-                    break;
-                case -1:
-                    out += '.';
-                    break;
-                case '.':
-                default:
-                    out += arr[r][c];
-                    break;
+        for(let c = 0; c <= maxWidth && c < arr[r].length; c++) {
+            if (charMap[arr[r][c]] !== undefined) {
+                out += charMap[arr[r][c]];
+            } else {
+                out += arr[r][c];
             }
-            // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
         }
         // eslint-disable-next-line no-console
         console.log(out);
     }
 }
 
-function paint2DCorner(arr, size) {
-    for (let r = 0; r < size && r < arr.length; r++) {
-        let out = '';
-        for(let c = 0; c < size && c < arr[r].length; c++) {
-            switch (arr[r][c]) {
-                case 0:
-                    out += ' ';
-                    break;
-                case 'O':
-                    out += chalk.bgGreen(chalk.red('O'));
-                    break;
-                case '#':
-                case 1:
-                    out += '█';
-                    break;
-                case -1:
-                    out += '.';
-                    break;
-                case '.':
-                default:
-                    out += arr[r][c];
-                    break;
-            }
-            // out += (arr[x][y] ? arr[x][y] === 1 ? 'W' : '_' : 'B');
-        }
-        // eslint-disable-next-line no-console
-        console.log(out);
-    }
-}
-
-// eslint-disable-next-line no-unused-vars
 function for2D(arr, fn, {
     xCond = x => x < arr.length,
     yCond = y => y < arr[0].length
@@ -145,11 +112,46 @@ function for2D(arr, fn, {
     }
 }
 
+function expand2D(map, addSize, addVal) {
+    return array2D(map[0].length + addSize * 2, map.length + addSize * 2, (y, x) => {
+        if (y - addSize < 0 
+            || x - addSize < 0
+            || y - addSize >= map.length
+            || x - addSize >= map[0].length
+        ) {
+            return addVal;
+        }
+        return map[y - addSize][x - addSize];
+    });
+}
+
 function arrayCount(array, item) {
     if (typeof item === 'function') {
         return _.flattenDeep(array).filter(item).length;
     }
     return _.flattenDeep(array).filter(x => x === item).length;
+}
+
+function convolve(map, kernelSize, fn) {
+    const newMap = _.cloneDeep(map);
+    const inset = Math.floor(kernelSize / 2);
+
+    for(let y = inset; y < newMap.length - inset; y++) {
+        for(let x = inset; x < newMap[0].length - inset; x++) {
+            
+            const window = [];
+            for(let wy = y - inset; wy <= y + inset; wy++) {
+                const row = [];
+                for(let wx = x - inset; wx <= x + inset; wx++) {
+                    row.push(map[wy][wx]);
+                }
+                window.push(row);
+            }
+            newMap[y][x] = fn(window, x, y);
+        }
+    }
+
+    return newMap;
 }
 
 function conwayStep(world, adjFunc, adjToNextMap) {
@@ -280,12 +282,13 @@ module.exports = {
 
     array2D,
     for2D,
+    expand2D,
+    convolve,
     ints,
     list2map,
     minIndexBy,
     maxIndexBy,
     paint2D,
-    paint2DCorner,
     posints,
     posInts: posints,
 
@@ -293,5 +296,5 @@ module.exports = {
     conwaySteps,
     adjCountHex,
 
-    arrayCount
+    arrayCount,
 };
