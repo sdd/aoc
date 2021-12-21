@@ -214,17 +214,14 @@ const AXIS_PERMS = [
 
 let found;
 function part1(input) {
+    // prepopulate data structures with contents of scanner[0] and build from there
     const unique = new Set(input[0].map(x => x.join(',')));
-
     found = _.times(input.length, () => null);
     found[0] = { offset: [0, 0, 0], orientation: 0, pivot: 0, transformed: _.cloneDeep(input[0]) };
 
-    let foundOne = true;
-    while(foundOne !== false) {
+    let foundOne;
+    do {
         foundOne = false;
-
-        const foundIndexes = Object.entries(found).filter(([i,v]) => v !== null).map(([i, v]) => Number(i));
-
         scanner: for(const indexA of [0]/* foundIndexes */) {
             for(let pivotIndexA = found[indexA].transformed.length - 1; pivotIndexA > 0; pivotIndexA--) {
 
@@ -242,12 +239,8 @@ function part1(input) {
                 ]);
 
                 for(let bIndex = 0; bIndex < input.length; bIndex++) {
-                    if (found[bIndex]) {
-                        continue;
-                    }
-                    // d('trying index %d vs %d', aIndex, bIndex);
+                    if (found[bIndex]) { continue; }
                     for(let bPivot = 0; bPivot < input[bIndex].length; bPivot++) {
-
                         // the beacons detected by beacon b, in beacon b local space
                         const b = input[bIndex];
                         for(let orientationIndexB = 0; orientationIndexB < AXIS_PERMS.length; orientationIndexB++) {
@@ -276,7 +269,6 @@ function part1(input) {
                             const inter = _.intersection(pivotSpaceA.map(x => x.join(',')), transformedB.map(x => x.join(',')));
 
                             if (inter.length >= 12) {
-                                d('found one: matched scanner %o to scanner %o (orientation %o, aPivot %o, bPivot %o)', indexA, bIndex, orientationIndexB, pivotIndexA, bPivot);
                                 foundOne = true;
 
                                 const offset = [
@@ -284,7 +276,6 @@ function part1(input) {
                                     found[indexA].transformed[pivotIndexA][1] - (Math.sign(orientationB[1]) * b[bPivot][Math.abs(orientationB[1]) - 1]),
                                     found[indexA].transformed[pivotIndexA][2] - (Math.sign(orientationB[2]) * b[bPivot][Math.abs(orientationB[2]) - 1])
                                 ];
-                                d('offset: %o', offset);
 
                                 const transformed = b.map(point => ([
                                     offset[0] + (Math.sign(orientationB[0]) * point[Math.abs(orientationB[0]) - 1]),
@@ -292,10 +283,7 @@ function part1(input) {
                                     offset[2] + (Math.sign(orientationB[2]) * point[Math.abs(orientationB[2]) - 1])
                                 ]));
 
-                                // for(let i = 0; i < Math.min(worldA.length, b.length); i++) {
-                                    // d('#%d: a orig = %o, a xformed = %o, b orig = %o, b xformed = %o', i, input[indexA][i], worldA[i], input[bIndex][i], transformed[i]);
-                                // }
-
+                                // add the transformed beacon locations to the set of beacons and scanner[0]'s points
                                 for(const point of transformed) {
                                     const stringified = point.join(',');
                                     if (!unique.has(stringified)) {
@@ -310,7 +298,7 @@ function part1(input) {
                                     pivot: bPivot,
                                     transformed,
                                 };
-                                d('found: %o out of %o', found.filter(x => x).length, input.length);
+                                d('found: %o out of %o (matched scanner %o to %o: offset %o, orientation %o, aPivot %o, bPivot %o)', found.filter(x => x).length, input.length, indexA, bIndex, offset, orientationIndexB, pivotIndexA, bPivot);
                                 break scanner;
                             }
                         }
@@ -318,7 +306,7 @@ function part1(input) {
                 }
             }
         }
-    }
+    } while(foundOne)
 
     d('found: %o out of %o', found.filter(x => x).length, input.length);
     return unique.size;

@@ -26,15 +26,16 @@ const ex2expectedP2 = '';
  * @param {Array<Number>} arg.nums numeric values in lines[0]
  * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
  * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
+ * @param {Array<string>} arg.chars lines[0] split on each char
  * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
- function parse({ raw, lines, alphanums, nums, comma, space, multi, grid }) {
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
     return nums;
 }
 
 function part1([xs, xe, ys, ye]) {
-    let maxYIntersect = Number.MIN_SAFE_INTEGER;
+    let maxYIntersect = -Infinity;
 
     for (let ix = 0; ix <= 100; ix++) {
         for (let iy = 0; iy <= 100; iy++) {
@@ -43,7 +44,7 @@ function part1([xs, xe, ys, ye]) {
             let y = 0;
             let dx = ix;
             let dy = iy;
-            let maxY = Number.MIN_SAFE_INTEGER;
+            let maxY = -Infinity;
             
             while(y > ys) {
                 x += dx;
@@ -82,14 +83,12 @@ function part2([xs, xe, ys, ye]) {
 
                 if (x >= xs && x <= xe && y >= ys && y <= ye) {
                     intersectCount.add(`${ix}_${iy}`);
-                    // d('intersect! pos=(%d, %d), ix=%d, iy=%d', x, y, ix, iy);
                 }
             }
 
         }
     }
     
-    // d('intersecting start points: %O', intersectCount);
     return intersectCount.size;
 }
 
