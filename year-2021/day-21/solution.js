@@ -2,7 +2,7 @@
 const d = require('debug')('solution');
 const _ = require('lodash');
 
-const util = require('../../utils');
+const { Counter } = require('../../utils');
 const imp = require('../../imp');
 const parsers = require('../../parse');
 
@@ -53,14 +53,15 @@ function part1(input) {
 
 function part2(input) {
     const initialState = { p: [input[0], input[1]], s: [0, 0], turn: 0 };
-    let states = new Map();
-    states.set(JSON.stringify(initialState), 1);
+    
+    let stateCounts = new Counter();
+    stateCounts.inc(JSON.stringify(initialState));
 
     const winCounts = [0, 0];
 
-    while(states.size) {
-        const nextStates = new Map();
-        for(let [state, count] of states.entries()) {
+    while(stateCounts.size) {
+        const nextStateCounts = new Counter();
+        for(let [state, count] of stateCounts.entries()) {
             state = JSON.parse(state);
 
             for(let r1 = 1; r1 <= 3; r1++) {
@@ -72,22 +73,18 @@ function part2(input) {
                         if (s >= 21) {
                             winCounts[state.turn] += count;
                         } else {
-                            let nextState = _.cloneDeep(state);
+                            const nextState = _.cloneDeep(state);
                             nextState.p[state.turn] = p;
                             nextState.s[state.turn] = s;
                             nextState.turn = 1 - nextState.turn;
-                            nextState = JSON.stringify(nextState);
-                            if (nextStates.has(nextState)) {
-                                nextStates.set(nextState, nextStates.get(nextState) + count);
-                            } else {
-                                nextStates.set(nextState, count);
-                            }
+                            
+                            nextStateCounts.add(JSON.stringify(nextState), count);
                         }
                     }
                 }
             }
         }
-        states = nextStates;
+        stateCounts = nextStateCounts;
     }
     return Math.max(...winCounts);
 }
