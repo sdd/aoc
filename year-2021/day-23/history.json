@@ -1,0 +1,19 @@
+{
+  "submissionBlockedUntil": false,
+  "sessions": [],
+  "wrongAnswers": {
+    "part1": [],
+    "part2": []
+  },
+  "rightAnswers": {
+    "part1": {
+      "answer": "14346",
+      "succeeded": "2021-12-23T10:10:45.034Z"
+    },
+    "part2": {
+      "answer": "48984",
+      "succeeded": "2021-12-23T11:20:11.056Z"
+    }
+  },
+  "created": "2021-12-23T05:00:01.276Z"
+}
