@@ -41,14 +41,6 @@ on x=-41..9,y=-7..43,z=-33..15`;
 const ex2expectedP1 = 590784;
 const ex2expectedP2 = 590784;
 
-// const ex2 = `on x=-20..26,y=-36..17,z=-47..7
-// on x=-20..27,y=0..4,z=0..4`;
-
-// const ex2 = `on x=5..8,y=1..17,z=5..7
-// on x=5..8,y=5..8,z=5..8`;
-// const ex2expectedP1 = 216;
-// const ex2expectedP2 = 216;
-
 /**
  * Input parser.
  * @param {Object} arg collection of pre-parsed helpers
@@ -78,7 +70,6 @@ const ex2expectedP2 = 590784;
 }
 
 function part1(input) {
-    input = _.cloneDeep(input);
     const world = new Map();
 
     for(let x=-50; x <= 50; x++) {
@@ -120,7 +111,7 @@ function part2(input) {
             continue;
         }
 
-        // create a list of new cubes starting with the one new master cube
+        // create a list of cuboids to process, starting with the new one from the input                    
         let newCuboids = [newCuboid];
         while(newCuboids.length) {
             const candidate = newCuboids.pop();
@@ -134,7 +125,7 @@ function part2(input) {
                 const [intersector] = intersectors.splice(intIdx, 1);
 
                 // split the intersector and candidate into disjoint cuboids
-                const result = splitCubes(intersector, candidate);
+                const result = splitCuboids(intersector, candidate);
 
                 // put the resulting cuboids back onto the list of volumes to process
                 newCuboids = newCuboids.concat(result);
@@ -161,7 +152,7 @@ function cuboidsIntersect(a, b) {
     return xInt && yInt && zInt;
 }
 
-function splitCubes(a, b) {
+function splitCuboids(a, b) {
     // short circuit if a and b are both same state and either a fully contains b or vice versa
     if ( !(a.state ^ b.state)) { // eslint-disable-line no-bitwise
         // check for b entirely within a
@@ -185,6 +176,7 @@ function splitCubes(a, b) {
         }
     }
 
+    // determine the planes that we need to split on in each axis
     const xPlanes = _.uniq([a.xl, b.xl, a.xh, b.xh]);
     const yPlanes = _.uniq([a.yl, b.yl, a.yh, b.yh]);
     const zPlanes = _.uniq([a.zl, b.zl, a.zh, b.zh]);
@@ -195,6 +187,7 @@ function splitCubes(a, b) {
     const volumesOn = [];
     const volumesOff = [];
 
+    // shatter the two cuboids to produce all volumes in all split planes
     for(let xi = 0; xi < xPlanes.length - 1; xi++) {
         for(let yi = 0; yi < yPlanes.length - 1; yi++) {
             for(let zi = 0; zi < zPlanes.length - 1; zi++) {
@@ -231,7 +224,7 @@ function splitCubes(a, b) {
     // we can optimise a bit here, rather than just returning [...onVolumes, ...offVolumes]
 
     if (a.state && b.state) {
-        // d('both on');
+        // d('both turned on');
         // if a and b were both on, keep the largest one intact 
         // and only take the fragments from the smallest.
         const volumeA = (a.xh - a.xl) * (a.yh - a.yl) * (a.zh - a.zl);
@@ -243,7 +236,7 @@ function splitCubes(a, b) {
         }
 
     } else if (a.state && !b.state) {
-        // d('a on b off');
+        // d('a turned on, b turned off');
         // if a was on and b was off, keep b and the frags of a.
         result = [...volumesOn, b];
     
