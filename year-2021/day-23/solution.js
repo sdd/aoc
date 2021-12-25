@@ -116,7 +116,7 @@ function partx(input) {
     while (stack.length){
         loops++;
         if (loops % 100000 === 0) {
-            d('loop %d, stack length %d', loops, stack.length);
+            // d('loop %d, stack length %d', loops, stack.length);
         }
         const currState = stack.pop();
 
@@ -146,7 +146,7 @@ function partx(input) {
             const totalCost = _.sum(_.map(currState, 'cost'));
             if (totalCost < bestCost) {
                 bestCost = totalCost;
-                d('new best cost: %d', bestCost);
+                // d('new best cost: %d', bestCost);
             }
             // d('all home! totalCost=%d, bestCost=%d', totalCost, bestCost);
             continue;
