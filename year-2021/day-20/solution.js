@@ -56,7 +56,7 @@ function part2(input) {
 function partx(input, steps) {
     let map = _.cloneDeep(input.map);
 
-    // add a buffer to the outside
+    // extend the map with two layers of dots
     map = util.expand2D(map, 2, '.');
 
     function kernel(window) {

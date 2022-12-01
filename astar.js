@@ -1,5 +1,6 @@
 const _ = require('lodash');
 
+// used in 2021d15.
 function search(grid, start, end) {
     start.h = manhattan(start, end);
     const openQueue = [start];
@@ -26,9 +27,11 @@ function search(grid, start, end) {
                 neighbour.f = neighbour.g + neighbour.h;
             }
 
-            if (!alreadyVisited) {
+            // maintain ordering in openQueue (ordered by ascending f)
+            if (!alreadyVisited) { 
                 openQueue.splice(_.sortedIndexBy(openQueue, neighbour, 'f'), 0, neighbour);
             } else {
+                // take neighbour out of openQueue and reinsert it at the correct position to maintain sort
                 openQueue.splice(_.findIndex(openQueue, x => x === neighbour), 1);
                 openQueue.splice(_.sortedIndexBy(openQueue, neighbour, 'f'), 0, neighbour);
             }

@@ -54,7 +54,7 @@ async function submitAnswer(state, spinner, level, answer) {
             spinner.fail(`INCORRECT ANSWER :-(  (lockout time: ${lockoutTime}`);
         }
         
-        return {wasCorrect, lockoutTime };
+        return { wasCorrect, lockoutTime };
     } catch(e) {
         spinner.fail(e.message);
         d('Error downloading input file: %o', e);

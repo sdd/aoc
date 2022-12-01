@@ -1,14 +1,10 @@
-/* eslint-disable prefer-destructuring */
-/* eslint-disable no-lonely-if */
-/* eslint-disable no-else-return */
+/* eslint-disable no-cond-assign,prefer-destructuring,no-lonely-if,no-else-return */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
-const combinations = require('combinations');
 const util = require('../../utils');
 const imp = require('../../imp');
 const parsers = require('../../parse');
-
 
 // First example and expected answers for each part.
 // Ignored if empty strings.
@@ -53,10 +49,7 @@ function part1(input) {
     return magnitude(reduced);
 }
 
-let totalActions;
-
 function part2(input) {
-    totalActions = 0;
     let maxMag = Number.MIN_SAFE_INTEGER;
 
     for(const a of _.range(0, input.length)) {
@@ -68,7 +61,6 @@ function part2(input) {
         }
     }
 
-    d('Total actions: %o', totalActions);
     return maxMag;
 }
 
@@ -83,7 +75,7 @@ function reduceSnailFish(initial) {
     let before = initial;
     let after;
 
-    while (++count < 600) { // arbitrary limit to prevent infinite loop in case of a bug
+    while (count++ < 600) { // arbitrary limit to prevent infinite loop in case of a bug
         if (before === (after = explode(before))) {
             // no explosion, check for split
             if (before === (after = split(before))) {
@@ -91,8 +83,6 @@ function reduceSnailFish(initial) {
                 return after;
             }
         }
-       
-        totalActions++;
         before = after;
     }
     d('LOOP LIMIT REACHED');

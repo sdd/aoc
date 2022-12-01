@@ -87,8 +87,8 @@ function applyChunk(z, chunk, digit, digitTracker, i, digits) {
         if (z.length) {
             z.pop();
             const b = digitTracker.pop();
-            const db = b ? digit[b] : 0;
-            d('%o gets matched with %o (%o, %o, %o, %o)', i, b, digit, db, chunk.b, b);
+            const db = b ? digits[b] : 0;
+            d('%o gets matched with %o (curr digit: %o, popped digit %o, chunk B %o)', i + 1, b + 1, digit, db, chunk.b);
         }
         // d('popping z down to %o', z);
     }

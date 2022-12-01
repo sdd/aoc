@@ -1,4 +1,3 @@
-/* eslint-disable no-continue */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
@@ -8,27 +7,20 @@ const parsers = require('../../parse');
 
 // First example and expected answers for each part.
 // Ignored if empty strings.
-const ex1 = `1163751742
-1381373672
-2136511328
-3694931569
-7463417111
-1319128137
-1359912421
-3125421639
-1293138521
-2311944581`;
-const ex1expectedP1 = 40;
-const ex1expectedP2 = 315;
+const ex1 = `ugknbfddgicrmopn
+aaa
+jchzalrnumimnmhp
+haegwjzuvuyypxyu
+dvszwmarrgswjxmb
+`;
+const ex1expectedP1 = 2;
+const ex1expectedP2 = ``;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
 const ex2 = ``;
 const ex2expectedP1 = ``;
 const ex2expectedP2 = ``;
-
-const { array2D } = require('../../utils');
-const { createNode, search } = require('../../astar');
 
 /**
  * Input parser.
@@ -44,46 +36,37 @@ const { createNode, search } = require('../../astar');
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
-    return grid;
+    return lines;
+}
+
+function threevowels(line) {
+    const vowels = ['a', 'e', 'i', 'o', 'u'];
+    let count = 0
+    for (const l of line.split('')) {
+        if (vowels.includes(l)) {
+            count++;
+            if (count === 3) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+function doubleletter(line) {
+    return !!line.match(/(\b\w*?(\w)\2.*?\b)/)
+}
+
+function notbadpairs(line) {
+    return !line.includes('ab') && !line.includes('cd') && !line.includes('pq') && !line.includes('xy')
 }
 
 function part1(input) {
-    const width = input[0].length;
-    const height = input.length;
-
-    const grid = array2D(width, height, (y, x) => createNode(x, y, input[y][x]));
-
-    const start = grid[0][0];
-    const end = grid[height - 1][width - 1];
-
-    const result = search(grid, start, end);
-
-    return _.sum(_.map(result, 'weight'));
+    return input.filter(line => threevowels(line) && doubleletter(line) && notbadpairs(line)).length
 }
 
 function part2(input) {
-    const width = input[0].length;
-    const height = input.length;
-
-    const fwidth = width * 5
-    const fheight = height * 5;
-
-    const grid = array2D(fwidth, fheight, (y, x) => {
-        const cellx = Math.floor(x / width);
-        const celly = Math.floor(y / height);
-        const added = cellx + celly;
-
-        const weight = ((input[y % height][x % width] + added - 1) % 9) + 1;
-
-        return createNode(x, y, weight);
-    });
-
-    const start = grid[0][0];
-    const end = grid[fheight - 1][fwidth - 1];
-    
-    const result = search(grid, start, end);
-
-    return _.sum(_.map(result, 'weight'));
+    return false;
 }
 
 module.exports = {

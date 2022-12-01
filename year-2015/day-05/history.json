@@ -1,0 +1,25 @@
+{
+  "submissionBlockedUntil": "2022-11-30T21:04:32.251Z",
+  "sessions": [],
+  "wrongAnswers": {
+    "part1": [
+      {
+        "answer": "0",
+        "submitted": "2022-11-30T20:53:49.234Z"
+      },
+      {
+        "answer": "410",
+        "submitted": "2022-11-30T20:59:32.251Z"
+      }
+    ],
+    "part2": []
+  },
+  "rightAnswers": {
+    "part1": {
+      "answer": "255",
+      "succeeded": "2022-11-30T21:01:28.455Z"
+    },
+    "part2": false
+  },
+  "created": "2022-11-24T17:01:59.435Z"
+}

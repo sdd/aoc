@@ -25,13 +25,12 @@ const ex2expectedP2 = ``;
  * @param {space} raw split on spaces, empty lines removed, items trimmed
  * @param {multi} raw, split on double newlines, empty items removed, split again on newlines, items trimmed
  */
-function parse({ raw, line, comma, space, multi }) {
-    return line
-    .map(l => l.split('x'));
+ function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
+    return lines.map(l => l.split('x'));
 }
 
 function part1(input) {
-    let res = input.map(([a, b, c]) => {
+    const res = input.map(([a, b, c]) => {
         const s1 = a*b;
         const s2 = a*c;
         let smallest = Math.min(s1, s2);
@@ -46,7 +45,15 @@ function part1(input) {
 }
 
 function part2(input) {
-    return false;
+    const res = input.map((vals) => {
+        vals.sort((a, b) => a - b);
+        const [x, y, z] = vals;        
+        const wrap = (x * 2) + (y * 2);
+        const bow = x * y * z;
+        return wrap + bow;
+    })
+
+    return _.sum(res);
 }
 
 module.exports = {

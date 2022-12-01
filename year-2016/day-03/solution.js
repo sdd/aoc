@@ -31,11 +31,17 @@ const ex2expectedP2 = ``;
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
-    return nums;
+    return lines.map(util.ints);
 }
 
 function part1(input) {
-    return false;
+    const res = input.map(arr => {
+        arr.sort((a, b) => a - b);
+        const [a, b, c] = arr;
+        return a + b > c ? 1 : 0;
+    });
+
+    return _.sum(res);
 }
 
 function part2(input) {

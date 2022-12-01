@@ -51,9 +51,7 @@ for (let year = 2020; year <= CURRENT_YEAR - (CURRENT_MONTH === 12 ? 0 : 1); yea
             // print a blank for theday
             console.log('∅');
         }
-
     }
-
 }
 
 })();
