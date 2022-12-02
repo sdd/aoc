@@ -1,0 +1,33 @@
+{
+  "submissionBlockedUntil": false,
+  "sessions": [],
+  "wrongAnswers": {
+    "part1": [
+      {
+        "answer": "13867",
+        "submitted": "2022-12-02T06:50:43.458Z"
+      },
+      {
+        "answer": "12398",
+        "submitted": "2022-12-02T06:52:56.926Z"
+      }
+    ],
+    "part2": [
+      {
+        "answer": "11968",
+        "submitted": "2022-12-02T07:01:54.646Z"
+      }
+    ]
+  },
+  "rightAnswers": {
+    "part1": {
+      "answer": "11873",
+      "succeeded": "2022-12-02T06:56:51.234Z"
+    },
+    "part2": {
+      "answer": "12014",
+      "succeeded": "2022-12-02T07:03:08.103Z"
+    }
+  },
+  "created": "2022-12-02T06:43:08.217Z"
+}
