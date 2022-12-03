@@ -5,6 +5,9 @@ const util = require('../../utils');
 const imp = require('../../imp');
 const parsers = require('../../parse');
 
+// add string tags here to help future categorization.
+const tags = ['LINES', 'INT_LIST', ];
+
 // First example and expected answers for each part.
 // Ignored if empty strings.
 const ex1 = `99
@@ -73,5 +76,6 @@ module.exports = {
     part1,
     part2,
     parse,
+    tags,
 };
 

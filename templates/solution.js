@@ -6,6 +6,9 @@ const imp = require('../../imp');
 const parsers = require('../../parse');
 const sets = require('../../sets');
 
+// add string tags here to help future categorization.
+const tags = [];
+
 // First example and expected answers for each part.
 // Ignored if empty strings.
 const ex1 = ``;
@@ -53,5 +56,6 @@ module.exports = {
     part1,
     part2,
     parse,
+    tags,
 };
 
