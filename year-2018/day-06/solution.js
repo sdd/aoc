@@ -93,7 +93,7 @@ function part2(input) {
     const yMin = _.min(input.map(x => x[1]));
     const yMax = _.max(input.map(x => x[1]));
 
-    // adjust target (32 for example 1m, 10000 for main q)
+    // adjust target (32 for example 1, 10000 for main q)
     const target = input.length === 6 ? 32 : 10000
 
     const buffer = 10;

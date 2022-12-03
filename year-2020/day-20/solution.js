@@ -115,7 +115,7 @@ Tile 3079:
 ..#.......
 ..#.###...`;
 const ex1expectedP1 = 20899048083289;
-const ex1expectedP2 = ``;
+const ex1expectedP2 = 273;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
@@ -127,9 +127,7 @@ const SEA_MONSTER_RAW = `                  #
 #    ##    ##    ###
  #  #  #  #  #  #   `;
 
-const SEA_MONSTER = SEA_MONSTER_RAW.split('\n').map(l => {
-    return l.split('').map(x => x === '#')
-});
+const SEA_MONSTER = SEA_MONSTER_RAW.split('\n').map(l => l.split('').map(x => x === '#'));
 
 /**
  * Input parser.
@@ -184,7 +182,7 @@ function part1(input) {
         });
     });
 
-    let matchCounts = tiles.map(({ id }) => {
+    const matchCounts = tiles.map(({ id }) => {
         let count = 0;
         _.forEach(Object.entries(tileSideMap), ([sideId, tileIds]) => {
             if (tileIds.includes(id) && tileIds.length > 1) count++;
@@ -192,17 +190,17 @@ function part1(input) {
         return ({ id, count });
     });
 
-    let realCorners = matchCounts.filter(x => x.count === 4);
+    const realCorners = matchCounts.filter(x => x.count === 4);
     return _.map(realCorners, 'id').reduce(_.multiply, 1);
 }
 
 function orientTile(tile, orientation) {
-    let { id, data, normal = [], flipped = [] } = tile;
+    const { id, data, normal = [], flipped = [] } = tile;
 
     let newData = [...data];
 
-    let needToFlipHoriz = orientation >= 4;
-    let rotations = orientation % 4;
+    const needToFlipHoriz = orientation >= 4;
+    const rotations = orientation % 4;
 
     let newNorm = [...normal];
     let newFlipped = [ ...flipped ];
@@ -221,7 +219,7 @@ function orientTile(tile, orientation) {
     }
 
     // orient data
-    let rotatedData = [];
+    const rotatedData = [];
     if (rotations === 0) {
         // don't rotate, but convert to 2d array still
         for(let r = 0; r < newData.length; r++) {
@@ -324,7 +322,7 @@ function matchOrientationToTop(tile, keyToMatch) {
 function part2(input) {
     const tiles = input.map(tile => ({ ...tile, sides: getTileSides(tile) }));
 
-    let tileMap = tiles.reduce((acc, tile) => {
+    const tileMap = tiles.reduce((acc, tile) => {
         acc[tile.id] = tile;
         tile.normal = tile.sides.slice(0, 4);
         tile.flipped = tile.sides.slice(4, tile.sides.length);
@@ -343,7 +341,7 @@ function part2(input) {
         });
     });
 
-    let matchCounts = tiles.map(({ id }) => {
+    const matchCounts = tiles.map(({ id }) => {
         let count = 0;
         _.forEach(Object.values(tileSideMap), (tileIds) => {
             if (tileIds.includes(id) && tileIds.length > 1) count++;
@@ -351,7 +349,7 @@ function part2(input) {
         return ({ id, count });
     });
 
-    let matchCountsCountMap = {};
+    const matchCountsCountMap = {};
     matchCounts.forEach(({ count }) => {
         if (matchCountsCountMap[count] === undefined) {
             matchCountsCountMap[count] = 1;
@@ -361,11 +359,11 @@ function part2(input) {
     });
 
     // find the corners
-    let cornerIds = matchCounts.filter(x => x.count === 4).map(x=>x.id);
+    const cornerIds = matchCounts.filter(x => x.count === 4).map(x=>x.id);
 
     // create empty map
-    let map = [];
-    let mapSideLength = Math.sqrt(tiles.length);
+    const map = [];
+    const mapSideLength = Math.sqrt(tiles.length);
     for(let r = 0; r < mapSideLength; r++) {
         map.push([]);
     }
@@ -396,32 +394,32 @@ function part2(input) {
     }
 
     // place the top left corner piece
-    let oriented = orientTile(tileMap[cornerIds[0]], orientation);
+    const oriented = orientTile(tileMap[cornerIds[0]], orientation);
     map[0][0] = { id: cornerIds[0], orientation, oriented, original: tileMap[cornerIds[0]] };
 
     // place middle of top row
     for(let r = 0; r < mapSideLength; r++) {
         if (r !== 0) {
             // place leftmost piece
-            let tileToTop = tileMap[map[r-1][0].id];
-            let tileToTopOriented = orientTile(tileToTop, map[r - 1][0].orientation);
-            let keyToMatch = tileToTopOriented.flipped[2];
-            let tileId = tileSideMap[keyToMatch].filter(i => i !== tileToTop.id)[0];
+            const tileToTop = tileMap[map[r-1][0].id];
+            const tileToTopOriented = orientTile(tileToTop, map[r - 1][0].orientation);
+            const keyToMatch = tileToTopOriented.flipped[2];
+            const tileId = tileSideMap[keyToMatch].filter(i => i !== tileToTop.id)[0];
 
-            let orientation = matchOrientationToTop(tileMap[tileId], keyToMatch);
-            let oriented = orientTile(tileMap[tileId], orientation);
+            const orientation = matchOrientationToTop(tileMap[tileId], keyToMatch);
+            const oriented = orientTile(tileMap[tileId], orientation);
             map[r][0] = { id: tileId, orientation, oriented, original: tileMap[tileId] };
         }
 
         // place following pieces
         for(let c = 1; c < mapSideLength; c++) {
-            let tileToLeft = tileMap[map[r][c - 1].id];
-            let tileToLeftOriented = orientTile(tileToLeft, map[r][c - 1].orientation);
-            let keyToMatch = tileToLeftOriented.flipped[1];
-            let tileId = tileSideMap[keyToMatch].filter(i => i !== tileToLeft.id)[0];
+            const tileToLeft = tileMap[map[r][c - 1].id];
+            const tileToLeftOriented = orientTile(tileToLeft, map[r][c - 1].orientation);
+            const keyToMatch = tileToLeftOriented.flipped[1];
+            const tileId = tileSideMap[keyToMatch].filter(i => i !== tileToLeft.id)[0];
 
-            let orientation = matchOrientationToLeft(tileMap[tileId], keyToMatch);
-            let oriented = orientTile(tileMap[tileId], orientation);
+            const orientation = matchOrientationToLeft(tileMap[tileId], keyToMatch);
+            const oriented = orientTile(tileMap[tileId], orientation);
             map[r][c] = { id:tileId, orientation, oriented, original: tileMap[tileId] };
         }
     }
@@ -435,7 +433,7 @@ function part2(input) {
         stitched.push([]);
         for(let c = 0; c < map[0].length * tileWidth; c++) {
             const mapTile = map[Math.floor(r / tileHeight)][Math.floor(c / tileWidth)];
-            let cellContent = mapTile.oriented.data[1 + (r % tileWidth)][1 + (c % tileHeight)];
+            const cellContent = mapTile.oriented.data[1 + (r % tileWidth)][1 + (c % tileHeight)];
             stitched[r].push(cellContent);
         }
     }
@@ -446,8 +444,8 @@ function part2(input) {
 
     // check stitched map for sea monsters
     for (let orientation = 0; orientation < 8; orientation++) {
-        let newStitched = _.cloneDeep(stitched);
-        let oStitched = orientTile({ data: newStitched }, orientation).data;
+        const newStitched = _.cloneDeep(stitched);
+        const oStitched = orientTile({ data: newStitched }, orientation).data;
         smCount = 0;
 
         for(let r = 0; r <= oStitched.length - SEA_MONSTER.length; r++) {
@@ -483,7 +481,7 @@ function part2(input) {
             roughness = _.flattenDeep(oStitched).filter(x => x === '#').length;
         }
         if (smCount > 0) {
-            //d('orientation: %d, monster count: %d', orientation, smCount);
+            // d('orientation: %d, monster count: %d', orientation, smCount);
             d('dimensions: %dw x %dh', oStitched[0].length, oStitched.length);
             util.paint2D(oStitched);
         }

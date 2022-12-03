@@ -1,3 +1,4 @@
+/* eslint-disable no-loop-func */
 const d = require('debug')('solution');
 const _ = require('lodash');
 
