@@ -6,11 +6,17 @@ const imp = require('../../imp');
 const parsers = require('../../parse');
 const sets = require('../../sets');
 
+
 // First example and expected answers for each part.
 // Ignored if empty strings.
-const ex1 = ``;
-const ex1expectedP1 = ``;
-const ex1expectedP2 = ``;
+const ex1 = `vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw`;
+const ex1expectedP1 = 157;
+const ex1expectedP2 = 70;
 
 // Second example and expected answers for each part.
 // Ignored if empty strings.
@@ -32,15 +38,28 @@ const ex2expectedP2 = ``;
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
-    return nums;
+    return lines.map(x => x.split(''));
 }
 
 function part1(input) {
-    return false;
+    return _.sum(input.map(r => {
+        const sacks = _.chunk(r, r.length / 2).map(x => new Set(x));
+
+        const inter = sets.intersection(...sacks);
+        const cc = [...inter.values()][0].charCodeAt(0);
+
+        return cc >= 97 ? (cc - 96) : (cc - 65 + 27);
+    }));
 }
 
 function part2(input) {
-    return false;
+    return _.sum(_.chunk(input, 3).map(chunk => {
+        const inter = chunk.map(x => new Set(x)).reduce(sets.intersection);
+
+        const cc = [...inter.values()][0].charCodeAt(0);
+
+        return cc >= 97 ? (cc - 96) : (cc - 65 + 27);
+    }));
 }
 
 module.exports = {
