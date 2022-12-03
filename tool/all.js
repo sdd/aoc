@@ -40,7 +40,7 @@ for (let year = 2020; year <= CURRENT_YEAR - (CURRENT_MONTH === 12 ? 0 : 1); yea
             state.questionInput = preProcessInput(await fileAccess.ensureInputFilesExist(state));
             state.history =  await fileAccess.ensureHistoryFileExists(state);
 
-            const results = solveOnce(state, false, true);
+            const results = solveOnce(state, true);
             //console.log({ results, state });
             const part1IsCorrect = state.history?.rightAnswers?.part1.answer === `${results.result1}`;
             const part2IsCorrect = state.history?.rightAnswers?.part2.answer === `${results.result2}`;

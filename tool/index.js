@@ -26,7 +26,8 @@ const chalk = require('chalk');
     const state = {
         pkgDir: await PkgDir(__dirname),
         sessionToken: process.env.AOC_SESSION,
-        ...(await startPrompt())
+        examplesOnly: !!process.env.EXAMPLES_ONLY,
+        ...(await startPrompt()),
     };
 
     const spinner = ora('starting...').start();
@@ -36,8 +37,8 @@ const chalk = require('chalk');
     keyHandler.initialise({
         'q': () => util.gracefulExit(state),
         '\u0003': () => util.gracefulExit(state),
-        'r': () => { solveOnce(state); showSolvePrompt(state); },
-        'e': () => { solveOnce(state, true); showSolvePrompt(state); },
+        'r': () => { state.examplesOnly = false; solveOnce(state); showSolvePrompt(state); },
+        'e': () => { state.examplesOnly = true; solveOnce(state); showSolvePrompt(state); },
         '1': () => tryAnswer(state, spinner, 1),
         '2': () => tryAnswer(state, spinner, 2),
         'd': async () => {
@@ -61,7 +62,7 @@ async function setupDay(state, spinner) {
     state.history =  await fileAccess.ensureHistoryFileExists(state, spinner);
 
     showInputStats(state); 
-    solveOnce(state, !!process.env.EXAMPLES_ONLY);
+    solveOnce(state);
     await autoSubmit(state, spinner);
     showSolvePrompt(state);
 
@@ -72,7 +73,7 @@ async function setupDay(state, spinner) {
         console.log(`${event} changed, rerunning...`);
         process.stdin.resume();
         showInputStats(state); 
-        solveOnce(state, !!process.env.EXAMPLES_ONLY);
+        solveOnce(state);
         await autoSubmit(state, spinner);
         showSolvePrompt(state);
     });

@@ -9,7 +9,8 @@ module.exports = {
     solveOnce
 };
 
-function solveOnce(state, examplesOnly = false, allMode = false) {
+function solveOnce(state, allMode = false) {
+    const { examplesOnly } = state;
     const solnPath = `../year-${state.year}/day-${String(state.day).padStart(2, '0')}/solution.js`;
     decache(solnPath);
 
