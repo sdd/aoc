@@ -6,34 +6,34 @@ const imp = require('../imp');
 const parsers = require('../parse');
 
 const data = imp.lineStr('01.txt');
-//const data = imp.lineNum('01.txt');
-//const data = imp.SpaceStr('01.txt');
-//const data = imp.SpaceNum('01.txt');
-//const data = imp.commaStr('01.txt');
-//const data = imp.commaNum('01.txt');
+// const data = imp.lineNum('01.txt');
+// const data = imp.SpaceStr('01.txt');
+// const data = imp.SpaceNum('01.txt');
+// const data = imp.commaStr('01.txt');
+// const data = imp.commaNum('01.txt');
 
 function parse(input) {
-    return input.map(x => {
-        //return x;
-        return parsers.splitNonAlphanum(x);
-    });
+    return input.map(x => 
+        // return x;
+         parsers.splitNonAlphanum(x)
+    );
 }
 
 function part1(input) {
     return input
-    .filter(([ lo, hi, letter, p ]) => {
-        let count = p.split('').filter(l => l === letter).length;
-        return count >= lo && count <= hi;
-    })
-    .length
+        .filter(([lo, hi, letter, p]) => {
+            const count = p.split('').filter(l => l === letter).length;
+            return count >= lo && count <= hi;
+        })
+        .length
 }
 
 function part2(input) {
     return input
-    .filter(([ lo, hi, letter, p ]) =>
-        (p[lo - 1] === letter) !== (p[hi - 1] === letter)
-    )
-    .length
+        .filter(([lo, hi, letter, p]) =>
+            (p[lo - 1] === letter) !== (p[hi - 1] === letter)
+        )
+        .length
 }
 
 module.exports = {

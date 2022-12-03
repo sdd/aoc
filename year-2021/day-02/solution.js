@@ -56,6 +56,8 @@ function part1(input) {
             case 'up':
                 d -= Number(dist);
                 break;
+            default:
+                // nothing
         }
     });
 
@@ -81,6 +83,8 @@ function part2(input) {
             case 'up':
                 a -= Number(dist);
                 break;
+            default:
+                // nothing
         }
     });
 
