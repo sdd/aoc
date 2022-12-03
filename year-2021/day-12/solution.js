@@ -64,7 +64,7 @@ class Graph extends Map {
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
-    const edges = lines.map(l => l.split('-'));
+    const edges = lines.map(parsers.splitNonAlphanum);
 
     const graph = new Graph();
     for (const [a, b] of edges) {

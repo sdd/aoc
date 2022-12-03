@@ -50,11 +50,7 @@ const ex2expectedP2 = ``;
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
     const callouts = comma;
-    const boards = multi.slice(1).map(board => 
-        board.map(row => 
-            parsers.splitNonAlphanum(row).map(Number)
-        )
-    );
+    const boards = multi.slice(1).map(board => parsers.parseGrid(board));
 
     return { callouts, boards };
 }

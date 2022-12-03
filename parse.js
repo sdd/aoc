@@ -1,5 +1,6 @@
 module.exports = {
     numberify,
+    parseGrid,
     splitNonAlphanum,
     splitNonAlphanumPos,
 };
@@ -23,4 +24,13 @@ function splitNonAlphanumPos(str) {
 function numberify(str) {
     const possNum = Number(str);
     return Number.isNaN(possNum) ? str : possNum;
+}
+
+function parseGrid(lines, separator) {
+    if (separator === undefined) {
+        return lines.map(row => 
+            splitNonAlphanum(row)
+        );
+    }
+    return lines.map(line => line.split(separator).map(numberify))
 }
