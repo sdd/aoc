@@ -39,8 +39,10 @@ const chalk = require('chalk');
         '\u0003': () => util.gracefulExit(state),
         'r': () => { state.examplesOnly = false; solveOnce(state); showSolvePrompt(state); },
         'e': () => { state.examplesOnly = true; solveOnce(state); showSolvePrompt(state); },
-        '1': () => tryAnswer(state, spinner, 1),
-        '2': () => tryAnswer(state, spinner, 2),
+        '1': () => { tryAnswer(state, spinner, 1); console.log('yo'); showSolvePrompt(state); },
+        '2': () => { tryAnswer(state, spinner, 2); showSolvePrompt(state); },
+        'u': () => { showSolvePrompt(state); },
+        'a': () => { state.abortWaiting = true; },
         'd': async () => {
             Object.assign(state, await startPrompt());
             await setupDay(state, spinner);

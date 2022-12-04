@@ -33,6 +33,29 @@ async function spinUntilProblemOpen(state, spinner) {
     spinner.succeed('problem unlocked!');
 }
 
+async function spinUntilUnblocked(state, spinner) {
+    const blockReleaseTime = new Date(state?.history?.submissionBlockedUntil);
+    if (Date.now() > blockReleaseTime) {
+        state.history.submissionBlockedUntil = undefined;
+        return true;
+    }
+
+    spinner.start('Waiting for block to expire');
+    while (Date.now() < blockReleaseTime) {
+        const remainingSeconds = Math.ceil((blockReleaseTime - Date.now()) / 1000);
+        spinner.text = `Blocked. Press a to abort waiting. (${remainingSeconds} seconds remaining)...`;
+        await new Promise(res => { setTimeout(res, 1000); });
+        if (state.abortWaiting) {
+            state.abortWaiting = false;
+            spinner.fail('Wait aborted.');
+            return false;
+        }
+    }
+    spinner.succeed('unblocked!');
+    state.history.submissionBlockedUntil = undefined;
+    return true;
+}
+
 async function tryAnswer(state, spinner, part) {
     const answer = state.latestAnswers[part-1];
     
@@ -55,6 +78,14 @@ async function tryAnswer(state, spinner, part) {
         return;
     }
 
+    if (state?.history?.submissionBlockedUntil) {
+        const unblockResult = await spinUntilUnblocked(state, spinner);
+        if (unblockResult == false) {
+            writeHistory(state);
+            return;
+        }
+    }
+
     // submit the answer
     spinner.start(`Submitting Part ${part} (answer: "${answer}")...`);
     const result = await api.submitAnswer(state, spinner, part, answer);
@@ -63,10 +94,7 @@ async function tryAnswer(state, spinner, part) {
     if (result.wasLockedOut) {
         spinner.fail(`You are locked out for ${result.lockoutTime} seconds`);
         state.history.submissionBlockedUntil = new Date(Date.now() + (result.lockoutTime * 1000));
-        return;
-    }
-    
-    if (result.wasCorrect) {
+    } else if (result.wasCorrect) {
         // log the correct answer and the time it was answered
         state.history.rightAnswers[`part${part}`] = { answer: answerToSubmit, succeeded: new Date() };
     } else {

@@ -17,6 +17,16 @@ function dashPad(str, len = process.stdout.columns) {
     return [_.repeat('-', left), str, _.repeat('-', right)].join(' ');
 }
 
+function getBlockedTimeRemaining(state) {
+    d('submissionBlockedUntil: %o', state.history?.submissionBlockedUntil);
+    if (!state.history?.submissionBlockedUntil) {
+        return 0;
+    }
+    const delta = (new Date(state.history?.submissionBlockedUntil)).getTime() - (new Date()).getTime();
+
+    return delta < 0 ? 0 : Math.ceil(delta / 1000);
+}
+
 function showSolvePrompt(state) {
     const options = [
       { key: 'r', msg: 're-run', color: 'green' },
@@ -26,22 +36,40 @@ function showSolvePrompt(state) {
     if (!state.history?.rightAnswers?.part1 && isSubmittable(state.latestAnswers[0])) {
         const prevBadAnswers = state.history.wrongAnswers.part1.map(x => x.answer);
         if (!prevBadAnswers.includes(`${state.latestAnswers[0]}`)) {
-            options.push({ key: '1', msg: 'submit part 1', color: 'bgRed' });
+            const blockTimeRemaining = getBlockedTimeRemaining(state);
+            if (!blockTimeRemaining) {
+                options.push({ key: '1', msg: 'submit part 1', color: 'bgGreen' });
+            } else {
+                options.push({ msg: `Locked Out (${blockTimeRemaining}s)`, color: 'bgYellow' });
+            }
+        } else {
+            options.push({ msg: 'part 1 KNOWN BAD', color: 'bgRed' });
         }
     }
     if (!state.history?.rightAnswers?.part2 && isSubmittable(state.latestAnswers[1])) {
         const prevBadAnswers = state.history.wrongAnswers.part2.map(x => x.answer);
         if (!prevBadAnswers.includes(`${state.latestAnswers[1]}`)) {
-            options.push({ key: '2', msg: 'submit part 2', color: 'bgRed' });
+            const blockTimeRemaining = getBlockedTimeRemaining(state);
+            if (!blockTimeRemaining) {
+                options.push({ key: '2', msg: 'submit part 2', color: 'bgGreen' });
+            } else {
+                options.push({ msg: `Locked Out (${blockTimeRemaining}s)`, color: 'bgYellow' });
+            }
+        } else {
+            options.push({ msg: 'part 1 KNOWN BAD', color: 'bgRed' });
         }
     }
 
-    options.push({ key: 'q', msg: 'quit', color: 'red' });
     options.push({ key: 'd', msg: 'change day', color: 'magenta' });
+    options.push({ key: 'q', msg: 'quit', color: 'red' });
 
-    const optionStrings = options.map(({ color, key, msg }) =>
-        chalk[color](`${key} to ${msg}`)
-    );
+    const optionStrings = options.map(({ color, key, msg }) => {
+        if (key !== undefined) {
+            return chalk[color](`${key} to ${msg}`);
+        } else {
+            return chalk[color](`${msg}`);
+        }
+    });
 
     console.log(`Options: press ${optionStrings.join(', ')}`);
 }

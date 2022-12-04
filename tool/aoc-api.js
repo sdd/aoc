@@ -6,8 +6,8 @@ const { CookieJar } = require('tough-cookie');
 
 const config = require('./config');
 
-const REGEX_LOCKOUT_TIME = /(\d+) ((minutes?|hours?))/;
-const REGEX_ALREADY_LOCKED_OUT = /You have (\d+)m (\d\d)s left to wait/;
+const REGEX_LOCKOUT_TIME = /lease wait (\w+) ((minutes?|hours?)) before trying again/;
+const REGEX_ALREADY_LOCKED_OUT = /You have( ?\d*m?) (\d{1,2})s left to wait/;
 const TEXT_INCORRECT_ANSWER = 'not the right answer';
 const TEXT_TOO_LOW = 'too low';
 const TEXT_TOO_HIGH = 'too high';
@@ -45,19 +45,22 @@ async function submitAnswer(state, spinner, level, answer) {
         const form = { level, answer };
         
         const response = await got.post(reqUrl, { form, cookieJar, retry: config.GOT_RETRY });
+        d('response body: %s', response.body);
         spinner.succeed('answer successfully submitted');
         spinner.start('parsing answer');
-        const { wasCorrect, lockoutTime } = parseForSuccess(response.body);
+        const { wasCorrect, wasLockedOut, lockoutTime } = parseForSuccess(response.body);
         if (wasCorrect) {
             spinner.succeed('CORRECT ANSWER!');
+        } else if (wasLockedOut) {
+            spinner.fail(`LOCKED OUT: COULD NOT SUBMIT :-(  (lockout time: ${lockoutTime})`);
         } else {
-            spinner.fail(`INCORRECT ANSWER :-(  (lockout time: ${lockoutTime}`);
+            spinner.fail(`INCORRECT ANSWER :-(  (lockout time: ${lockoutTime})`);
         }
         
-        return { wasCorrect, lockoutTime };
+        return { wasCorrect, wasLockedOut, lockoutTime };
     } catch(e) {
         spinner.fail(e.message);
-        d('Error downloading input file: %o', e);
+        d('Error submitting answer: %o', e);
         throw e;
     }
 }
@@ -65,17 +68,19 @@ async function submitAnswer(state, spinner, level, answer) {
 function parseForSuccess(str) {
     const alreadyLockedOut = str.match(REGEX_ALREADY_LOCKED_OUT);
     if (alreadyLockedOut) {
-        const lockoutTime = alreadyLockedOut[1] * 60 + alreadyLockedOut[2];
+        // d('alreadyLockedOut: %o', alreadyLockedOut);
+        const lockoutTime = ((Number(alreadyLockedOut[1].slice(0, -1)) || 0) * 60) + (Number(alreadyLockedOut[2])) 
         return { wasLockedOut: true, lockoutTime };
     }
     
-    const wasCorrect = !str.includes(TEXT_INCORRECT_ANSWER);
+    const lockedOut = str.match(REGEX_LOCKOUT_TIME);
+    // d('lockedOut: %o', lockedOut);
+    const lockoutTime = lockedOut && word2num(lockedOut[1]) * (lockedOut[2].slice(0, 6) === 'minute' ? 60 : 1) 
+    lockedOut && d('locked Out: %s (%d seconds)', lockedOut[1], lockoutTime);
+
+    const wasCorrect = !lockedOut && !str.includes(TEXT_INCORRECT_ANSWER);
     const tooLow = !wasCorrect && str.includes(TEXT_TOO_LOW); 
     const tooHigh = !wasCorrect && str.includes(TEXT_TOO_HIGH);
-    const lockedOut = !wasCorrect && str.match(REGEX_LOCKOUT_TIME);
-    lockedOut && d('locked Out: %s', lockedOut[1]);
-    
-    const lockoutTime = lockedOut && word2num(lockedOut[1]) * (lockedOut[2].slice(0, 6) === 'minute' ? 60 : 1) 
 
     return { wasCorrect, tooLow, tooHigh, lockoutTime };
 }
