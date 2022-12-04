@@ -53,6 +53,7 @@ module.exports = {
     turnDir,
     moveForward,
     taxiDist,
+    D8_TO_RCD,
 };
 
 function newState(x = 0, y = 0, dxy = 0) {

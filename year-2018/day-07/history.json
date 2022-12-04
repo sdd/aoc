@@ -1,0 +1,12 @@
+{
+  "sessions": [],
+  "wrongAnswers": {
+    "part1": [],
+    "part2": []
+  },
+  "rightAnswers": {
+    "part1": false,
+    "part2": false
+  },
+  "created": "2022-12-04T05:28:51.967Z"
+}
