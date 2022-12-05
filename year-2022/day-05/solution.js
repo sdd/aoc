@@ -35,15 +35,58 @@ const ex2expectedP2 = ``;
  * @param {Array<Array<string>} arg.grid 2D char grid
  */
  function parse({ raw, lines, alphanums, nums, comma, space, chars, multi, grid }) {
-    return nums;
+    const moves = multi[1].map(line => util.posInts(line));
+
+    const rawInit = raw.split('\n\n')[0].split('\n');
+
+    const initial = rawInit.slice(0, -1).map(line => _.chunk(line.split(''), 4).map(l => l[1]));
+    
+    const buckets = util.array2D(9, 0);
+    while(initial.length) {
+        const row = initial.pop();
+        for (let x = 0; x < row.length; x++) {
+            if (row[x] !== ' ' && row[x] !== undefined) {
+                buckets[x].push(row[x]);
+            }
+        }
+    }
+
+    return [{ moves, buckets }];
 }
 
-function part1(input) {
-    return false;
+function part1([{ buckets, moves }]) {
+    buckets = _.clone(buckets);
+    moves = _.clone(moves);
+
+    for( const [qty, from, to] of moves) {
+        const chunk = buckets[from - 1].splice(buckets[from - 1].length - qty, qty);
+        chunk.reverse();
+        buckets[to - 1] = buckets[to - 1].concat(chunk);
+    }
+
+    const res = [];
+    for(const bucket of buckets) {
+        res.push(bucket.pop());
+    }
+
+    return res.join('');
 }
 
-function part2(input) {
-    return false;
+function part2([{ buckets, moves }]) {
+    buckets = _.clone(buckets);
+    moves = _.clone(moves);
+
+    for( const [qty, from, to] of moves) {
+        const chunk = buckets[from - 1].splice(buckets[from - 1].length - qty, qty);
+        buckets[to - 1] = buckets[to - 1].concat(chunk);
+    }
+
+    const res = [];
+    for(const bucket of buckets) {
+        res.push(bucket.pop());
+    }
+
+    return res.join('');
 }
 
 module.exports = {
