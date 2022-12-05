@@ -7,7 +7,7 @@ const parsers = require('../../parse');
 const sets = require('../../sets');
 
 // add string tags here to help future categorization.
-const tags = [];
+const tags = ['MULTI', 'CUSTOM_PARSER', ];
 
 // First example and expected answers for each part.
 // Ignored if empty strings.
@@ -38,8 +38,8 @@ const ex2expectedP2 = ``;
     const moves = multi[1].map(line => util.posInts(line));
 
     const rawInit = raw.split('\n\n')[0].split('\n');
-
-    const initial = rawInit.slice(0, -1).map(line => _.chunk(line.split(''), 4).map(l => l[1]));
+    const initial = rawInit.slice(0, -1)
+        .map(line => _.chunk(line.split(''), 4).map(l => l[1]));
     
     const buckets = util.array2D(9, 0);
     while(initial.length) {
@@ -56,7 +56,6 @@ const ex2expectedP2 = ``;
 
 function part1([{ buckets, moves }]) {
     buckets = _.clone(buckets);
-    moves = _.clone(moves);
 
     for( const [qty, from, to] of moves) {
         const chunk = buckets[from - 1].splice(buckets[from - 1].length - qty, qty);
@@ -64,29 +63,18 @@ function part1([{ buckets, moves }]) {
         buckets[to - 1] = buckets[to - 1].concat(chunk);
     }
 
-    const res = [];
-    for(const bucket of buckets) {
-        res.push(bucket.pop());
-    }
-
-    return res.join('');
+    return buckets.map(b => b.pop()).join('');
 }
 
 function part2([{ buckets, moves }]) {
     buckets = _.clone(buckets);
-    moves = _.clone(moves);
 
     for( const [qty, from, to] of moves) {
         const chunk = buckets[from - 1].splice(buckets[from - 1].length - qty, qty);
         buckets[to - 1] = buckets[to - 1].concat(chunk);
     }
 
-    const res = [];
-    for(const bucket of buckets) {
-        res.push(bucket.pop());
-    }
-
-    return res.join('');
+    return buckets.map(b => b.pop()).join('');
 }
 
 module.exports = {
