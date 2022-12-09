@@ -38,7 +38,7 @@ const D8_TO_RCD = Object.freeze([
     [-1, -1], // NW
 ]);
 
-const S8_TO_D8 = Object.freeze({
+const C8_TO_D8 = Object.freeze({
     ne: 0,
     e: 1,
     se: 2,
@@ -47,13 +47,22 @@ const S8_TO_D8 = Object.freeze({
     nw: 5,
 });
 
+
+const DIR_TO_D4 = { 'U': 0, 'R': 1, 'D': 2, 'L': 3 };
+const C4_TO_D4 = { 'N': 0, 'E': 1, 'S': 2, '"': 3 };
+
 module.exports = {
     newState,
     setDir,
     turnDir,
     moveForward,
     taxiDist,
+    D4_TO_RCD,
     D8_TO_RCD,
+    DIR_TO_D4,
+    D6_TO_RCD,
+    C8_TO_D8,
+    C4_TO_D4,
 };
 
 function newState(x = 0, y = 0, dxy = 0) {

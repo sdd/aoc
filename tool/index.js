@@ -106,8 +106,23 @@ async function autoSubmit(state, spinner) {
         }
     }
 
-    if (!state.history?.rightAnswers?.part2) {
-        // correct answer not yet submitted for part2
+    if (state.history?.rightAnswers?.part1 && !state.history?.rightAnswers?.part2) {
+        // correct answer submitted for part1 but not yet submitted for part2
+
+        if (state.day == 25) {
+            // xmas day part 2 answer is usually 0
+
+            const prevBadAnswers = state.history.wrongAnswers.part2.map(x => x.answer);
+            if (!prevBadAnswers.includes(`0`)) {
+                // havent yet tried 0
+
+                state.latestAnswers[1] = '0';
+
+                console.log(chalk.magenta(dashPad('AUTO SUBMIT - XMAS DAY PART 2 MODE')));
+                await tryAnswer(state, spinner, 2);
+                console.log(chalk.magenta(dashPad()));
+            }
+        }
 
         if (state.ex1p2Correct && (state.ex2p2Correct || !state.ex2)) {
             // example 1 correctly solved for part 2, example 2 either not present or solved for part 2

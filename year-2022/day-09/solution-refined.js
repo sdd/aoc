@@ -2,6 +2,7 @@ const d = require('debug')('solution');
 const _ = require('lodash');
 
 const util = require('../../utils');
+const { DIR_TO_D4, D4_TO_RCD } = require('../../maze');
 const imp = require('../../imp');
 const parsers = require('../../parse');
 const sets = require('../../sets');
@@ -32,7 +33,7 @@ R 17
 D 10
 L 25
 U 20`;
-const ex2expectedP1 = ``;
+const ex2expectedP1 = 88;
 const ex2expectedP2 = 36;
 
 /**
@@ -52,67 +53,34 @@ const ex2expectedP2 = 36;
     return lines.map(x => x.split(' '));
 }
 
-const MAP_DIR_TO_X = {
-    'U': 0,
-    'D': 0, 
-    'L': -1,
-    'R': 1
-};
-
-const MAP_DIR_TO_Y = {
-    'U': -1,
-    'D': 1, 
-    'L': 0,
-    'R': 0
-};
-
 function part1(input) {
-    const tPos =new Set();
-    let hx = 0;
-    let hy = 0;
-    let tx = 0;
-    let ty = 0;
-
-    for(const [dir, dist] of input) {
-        for(let i = 0; i < dist; i++) {
-            
-            hy += MAP_DIR_TO_Y[dir];
-            hx += MAP_DIR_TO_X[dir];
-
-            if (Math.abs(hx - tx) > 1 || Math.abs(hy - ty) > 1) {
-                tx += Math.sign(hx - tx);
-                ty += Math.sign(hy - ty);
-            }
-
-            tPos.add(`${tx},${ty}`);
-        }
-    }
-
-    return tPos.size;
+    return part2(input, 2);
 }
 
-function part2(input) {
-    const rope = util.array2D(10, 2);
+const AXES = [0, 1];
+
+function part2(input, size = 10) {
+    const rope = util.array2D(size, 2);
     
     const tPos = new Set();    
     tPos.add(`0,0`);
 
     for(const [dir, dist] of input) {
-        for(let i = 0; i < dist; i++) {
-            
-            rope[0][1] += MAP_DIR_TO_Y[dir];
-            rope[0][0] += MAP_DIR_TO_X[dir];
+        _.times(dist, () => {
+            AXES.forEach(ax => {
+                rope[0][ax] += D4_TO_RCD[DIR_TO_D4[dir]][ax];
+            });
 
-            for (let j = 1; j < 10; j++) {
-                if (Math.abs(rope[j-1][0] - rope[j][0]) > 1
-                    || Math.abs(rope[j-1][1] - rope[j][1]) > 1) {
-                    rope[j][0] += Math.sign(rope[j-1][0] - rope[j][0]);
-                    rope[j][1] += Math.sign(rope[j-1][1] - rope[j][1]);
+            _.times(size - 1, j => {
+                if (AXES.map(ax => Math.abs(rope[j][ax] - rope[j+1][ax])).some(x => x > 1)) {
+                    AXES.forEach(ax => {
+                        rope[j+1][ax] += Math.sign(rope[j][ax] - rope[j+1][ax]);
+                    })
                 }
-            }
+            });
 
-            tPos.add(`${rope[9][0]},${rope[9][1]}`);
-        }
+            tPos.add(`${rope[size - 1][0]},${rope[size - 1][1]}`);
+        });
     }
 
     return tPos.size;
@@ -130,4 +98,3 @@ module.exports = {
     parse,
     tags,
 };
-
