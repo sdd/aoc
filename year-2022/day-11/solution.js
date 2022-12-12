@@ -81,7 +81,6 @@ const ex2expectedP2 = ``;
 function part1(input) {
     const monkeys = _.cloneDeep(input);
     const inspections = array2D(1, monkeys.length, () => 0)[0];
-    d({ inspections });
 
     for(let round = 1; round <= 20; round++) {
         for(let mIdx = 0; mIdx < monkeys.length; mIdx++) {
@@ -126,7 +125,6 @@ function part1(input) {
 function part2(input) {
     const monkeys = _.cloneDeep(input);
     const inspections = array2D(1, monkeys.length, () => 0)[0];
-    d({ inspections });
 
     const modulus = monkeys.map(x => x.test).reduce((acc, val) => acc * val, 1);
 
