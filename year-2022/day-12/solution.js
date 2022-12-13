@@ -8,7 +8,7 @@ const sets = require('../../sets');
 const { D4_TO_RCD } = require('../../maze');
 
 // add string tags here to help future categorization.
-const tags = [];
+const tags = ['GRID', 'SEARCH', 'PATH'];
 
 // First example and expected answers for each part.
 // Ignored if empty strings.
