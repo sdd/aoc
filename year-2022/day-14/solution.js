@@ -205,6 +205,7 @@ function part2(input) {
         }
     }
 
+    // draw floor
     for(let x = 0; x < grid[0].length; x++) {
         grid[grid.length - 1][x] = 1;
     }
@@ -218,17 +219,9 @@ function part2(input) {
         while(moved) {
             moved = false;
 
-            if (grid[sandpos[1] - miny + 1] === undefined) {
-                return sandcount;
-            }
-
             if (grid[sandpos[1] - miny + 1][sandpos[0] - minx] === 0) {
                 sandpos[1]++;
                 moved = true;
-
-                if (sandpos[0] < minx || sandpos[0] > maxx || sandpos[1] > maxy || sandpos[1] < miny) {
-                    return sandcount;
-                }
                 continue;
             }
 
@@ -236,30 +229,14 @@ function part2(input) {
                 sandpos[1]++;
                 sandpos[0]--;
                 moved = true;
-
-                if (sandpos[0] < minx || sandpos[0] > maxx || sandpos[1] > maxy || sandpos[1] < miny) {
-                    return sandcount;
-                }
                 continue;
-            }
-
-            if (grid[sandpos[1] - miny + 1][sandpos[0] - minx - 1] === undefined) {
-                return sandcount;
             }
 
             if (grid[sandpos[1] - miny + 1][sandpos[0] - minx + 1] === 0) {
                 sandpos[1]++;
                 sandpos[0]++;
                 moved = true;
-
-                if (sandpos[0] < minx || sandpos[0] > maxx || sandpos[1] > maxy || sandpos[1] < miny) {
-                    return sandcount;
-                }
                 continue;
-            }
-
-            if (grid[sandpos[1] - miny + 1][sandpos[0] - minx + 1] === undefined) {
-                return sandcount;
             }
 
             if (sandpos[1] === 0) {
@@ -271,8 +248,6 @@ function part2(input) {
 
         grid[sandpos[1] - miny][sandpos[0] - minx] = 'o';
         sandcount++;
-
-        // util.paint2D(grid);
     }
 
     return sandcount;
