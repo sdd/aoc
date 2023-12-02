@@ -1,0 +1,23 @@
+{
+  "sessions": [],
+  "wrongAnswers": {
+    "part1": [
+      {
+        "answer": "5050",
+        "submitted": "2023-12-02T05:17:35.131Z"
+      }
+    ],
+    "part2": []
+  },
+  "rightAnswers": {
+    "part1": {
+      "answer": "1867",
+      "succeeded": "2023-12-02T05:21:08.821Z"
+    },
+    "part2": {
+      "answer": "84538",
+      "succeeded": "2023-12-02T05:27:02.904Z"
+    }
+  },
+  "created": "2023-12-02T05:03:00.106Z"
+}
