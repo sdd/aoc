@@ -61,7 +61,7 @@ const ex2expectedP2 = ``;
  * @param {Array<string>} arg.lines raw split on newlines, trimmed, empty filtered
  * @param {Array<string|Number>} arg.alphanums alphanumeric groups in lines[0]
  * @param {Array<Number>} arg.nums numeric values in lines[0]
- * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered 
+ * @param {Array<string>} arg.comma split on commas, trimmed, empty filtered
  * @param {Array<string>} arg.space split on spaces, trimmed, empty filtered
  * @param {Array<string>} arg.chars split lines[0] on every char
  * @param {Array<Array<string>} arg.multi split on double newlines, empty filtered, split again on newlines, trimmed
@@ -123,53 +123,46 @@ function part1(input) {
 function part2(input) {
     const { seeds, maps } = input;
 
-    let seedRanges = _.chunk(seeds, 2).map(([a, b]) => [a, a+b]);
+    let seedRanges = _.chunk(seeds, 2).map(([a, b]) => [a, a+b-1]);
 
     let loc = 'seed';
     let newSeedRanges = [];
 
     while(loc !== 'location') {
         const map = _.find(maps, x => x.from === loc);
-        if (!map) {
-            return `could not find map from ${loc}`;
-        }
-        d({ seedRanges });
 
-        seedRanges.forEach(seedRange => {
-            const range = _.find(map.ranges, r => (seedRange[0] >= r.srcStart) && (seedRange[1] <= (r.srcStart + r.rLen)));
-            d({ range });
+        while(seedRanges.length) {
+            seedRange = seedRanges.pop();
+
+            const range = _.find(map.ranges, r =>
+                    ((seedRange[0] >= r.srcStart) && (seedRange[0] <= (r.srcStart + r.rLen - 1)))
+                    || ((seedRange[1] >= r.srcStart) && (seedRange[1] <= (r.srcStart + r.rLen - 1)))
+            );
+
             if (range) {
                 const lenBefore = range.srcStart - seedRange[0];
-                d({ lenBefore });
                 if (lenBefore > 0) {
-                    newSeedRanges.push([seedRange[0], range.srcStart - 1]);
+                    seedRanges.push([seedRange[0], range.srcStart - 1]);
                 }
 
-                const lenAfter = seedRange[1] - (range.srcStart + range.rLen);
-                d({ lenAfter });
+                const lenAfter = seedRange[1] - (range.srcStart + range.rLen - 1);
                 if (lenAfter > 0) {
-                    newSeedRanges.push([range.srcStart + range.rLen + 1, seedRange[1]]);
+                    seedRanges.push([range.srcStart + range.rLen, seedRange[1]]);
                 }
 
                 const startWithin = Math.max(seedRange[0], range.srcStart);
-                const endWithin = Math.min(seedRange[1], range.srcStart + range.rLen);
-                
-                d({ startWithin, endWithin });
-                
+                const endWithin = Math.min(seedRange[1], range.srcStart + range.rLen - 1);
+
                 if (startWithin >= seedRange[0] && endWithin <= seedRange[1]) {
-                    const newRange = [
+                    newSeedRanges.push([
                         startWithin - range.srcStart + range.destStart,
                         endWithin - range.srcStart + range.destStart
-                    ]
-                    d({ newRange});
-                    newSeedRanges.push(newRange);
-                } else {
-                    d('help');
+                    ]);
                 }
             } else {
                 newSeedRanges.push(seedRange);
             }
-        });
+        }
 
         loc = map.to;
         seedRanges = newSeedRanges;
@@ -191,4 +184,3 @@ module.exports = {
     parse,
     tags,
 };
-
